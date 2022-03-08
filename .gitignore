@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-*secret
+*secret.java
 
 ### STS ###
 .apt_generated

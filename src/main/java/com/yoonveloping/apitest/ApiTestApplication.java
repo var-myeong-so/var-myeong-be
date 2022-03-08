@@ -1,13 +1,14 @@
 package com.yoonveloping.apitest;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.yoonveloping.apitest.papago.Controller;
 
-@SpringBootApplication
+// 네이버 기계번역 (Papago SMT) API 예제
 public class ApiTestApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ApiTestApplication.class, args);
-	}
+	private static final String SOURCE_LANGUAGE = "가져오다";
 
+	public static void main(String[] args) {
+		Controller controller = new Controller(SOURCE_LANGUAGE);
+		controller.control();
+	}
 }

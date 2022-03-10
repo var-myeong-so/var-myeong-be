@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class WebController {
@@ -17,10 +18,9 @@ public class WebController {
 	}
 
 	@GetMapping("/translate")
-	public String translate(Model model) {
-		final String text = papagoService.post();
+	public String translate(Model model, @RequestParam(required = false) String originalText) {
+		final String text = papagoService.post(originalText);
 
-		final String originalText = papagoService.getSourceLanguage();
 		model.addAttribute("text", originalText);
 		System.out.println("originalText = " + originalText);
 

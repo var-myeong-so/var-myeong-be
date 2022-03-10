@@ -16,17 +16,10 @@ import org.springframework.stereotype.Service;
 public class PapagoServiceImpl implements PapagoService {
 
 	private static final String API_URL = "https://openapi.naver.com/v1/papago/n2mt";
-	private final SourceData sourceData;
 	private final Request requestHeaders;
 
-	public PapagoServiceImpl(SourceData sourceData, Request requestHeaders) {
-		this.sourceData = sourceData;
+	public PapagoServiceImpl(Request requestHeaders) {
 		this.requestHeaders = requestHeaders;
-	}
-
-	@Override
-	public String getSourceLanguage() {
-		return sourceData.getSourceLanguage();
 	}
 
 	@Override
@@ -38,9 +31,9 @@ public class PapagoServiceImpl implements PapagoService {
 	}
 
 	@Override
-	public String post() {
+	public String post(String originalText) {
 		HttpURLConnection con = connect();
-		String postParams = "source=ko&target=en&text=" + sourceData.getSourceLanguage(); //원본언어: 한국어 (ko) -> 목적언어: 영어 (en)
+		String postParams = "source=ko&target=en&text=" + originalText; //원본언어: 한국어 (ko) -> 목적언어: 영어 (en)
 		try {
 			con.setRequestMethod("POST");
 			for (Map.Entry<String, String> header : requestHeaders.getRequestHeaders().entrySet()) {

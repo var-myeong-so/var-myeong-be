@@ -10,7 +10,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PapagoServiceImpl implements PapagoService {
 
 	private static final String API_URL = "https://openapi.naver.com/v1/papago/n2mt";

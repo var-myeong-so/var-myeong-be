@@ -1,8 +1,10 @@
 package com.yoonveloping.apitest.papago;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public interface PapagoService {
 
-	String parsing(String jsonString);
+	String parsing(JsonNode jsonObject);
 
-	String post(String originalText);
+	JsonNode post(String originalText);
 }

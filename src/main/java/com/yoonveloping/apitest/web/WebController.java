@@ -1,5 +1,6 @@
 package com.yoonveloping.apitest.web;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.yoonveloping.apitest.papago.PapagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,7 @@ public class WebController {
 
 	@GetMapping("/translate")
 	public String translate(Model model, @RequestParam(required = false) String originalText) {
-		final String text = papagoService.post(originalText);
+		final JsonNode text = papagoService.post(originalText);
 
 		model.addAttribute("text", originalText);
 		System.out.println("originalText = " + originalText);

@@ -1,5 +1,10 @@
 package com.yoonveloping.apitest.papago;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -9,7 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import org.json.JSONObject;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,19 +28,18 @@ public class PapagoServiceImpl implements PapagoService {
 	}
 
 	@Override
-	public String parsing(String jsonString) {
-		JSONObject jObject = new JSONObject(jsonString);
-		JSONObject message = jObject.getJSONObject("message");
-		JSONObject result = message.getJSONObject("result");
-		return result.getString("translatedText");
+	public String parsing(JsonNode jsonObject) {
+		final JsonNode translatedText = jsonObject.findValue("translatedText");
+		return translatedText.asText();
 	}
 
+	// TODO::WebClient로 리팩토링
 	@Override
-	public String post(String originalText) {
+	public JsonNode post(String originalText) {
 		HttpURLConnection con = connect();
 		String postParams = "source=ko&target=en&text=" + originalText; //원본언어: 한국어 (ko) -> 목적언어: 영어 (en)
 		try {
-			con.setRequestMethod("POST");
+			con.setRequestMethod(String.valueOf(HttpMethod.POST));
 			for (Map.Entry<String, String> header : requestHeaders.getRequestHeaders().entrySet()) {
 				con.setRequestProperty(header.getKey(), header.getValue());
 			}
@@ -67,15 +71,20 @@ public class PapagoServiceImpl implements PapagoService {
 		}
 	}
 
-	private String readBody(InputStream body) {
-		InputStreamReader streamReader = new InputStreamReader(body);
+	private JsonNode readBody(InputStream body) {
+		ObjectMapper mapper = new ObjectMapper()
+			.registerModule(new JavaTimeModule())
+			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+			.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,false);
+
+		final InputStreamReader streamReader = new InputStreamReader(body);
 		try (BufferedReader lineReader = new BufferedReader(streamReader)) {
-			StringBuilder responseBody = new StringBuilder();
+			final StringBuilder responseBody = new StringBuilder();
 			String line;
 			while ((line = lineReader.readLine()) != null) {
 				responseBody.append(line);
 			}
-			return responseBody.toString();
+			return mapper.readTree(responseBody.toString());
 		} catch (IOException IOE) {
 			throw new RuntimeException("API 응답을 읽는데 실패했습니다.", IOE);
 		}

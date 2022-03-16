@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class PapagoServiceImpl implements PapagoService {
 
 	private static final String API_URL = "https://openapi.naver.com/v1/papago/n2mt";
+	private static final String TRANSLATED_TEXT_IN_JSON = "translatedText";
 	private final Request requestHeaders;
 
 	public PapagoServiceImpl(Request requestHeaders) {
@@ -29,7 +30,7 @@ public class PapagoServiceImpl implements PapagoService {
 
 	@Override
 	public String parsing(JsonNode jsonObject) {
-		final JsonNode translatedText = jsonObject.findValue("translatedText");
+		final JsonNode translatedText = jsonObject.findValue(TRANSLATED_TEXT_IN_JSON);
 		return translatedText.asText();
 	}
 
@@ -75,7 +76,7 @@ public class PapagoServiceImpl implements PapagoService {
 		ObjectMapper mapper = new ObjectMapper()
 			.registerModule(new JavaTimeModule())
 			.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-			.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE,false);
+			.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
 
 		final InputStreamReader streamReader = new InputStreamReader(body);
 		try (BufferedReader lineReader = new BufferedReader(streamReader)) {

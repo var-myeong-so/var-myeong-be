@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoonveloping.apitest.sample.SampleController;
+import java.time.Duration;
 import java.util.Objects;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 @RestController
 public class WebclientController {
@@ -28,12 +31,20 @@ public class WebclientController {
         if (Objects.isNull(externalUrl)) {
             externalUrl = SampleController.SAMPLE_API_PATH;
         }
-        return WebClient.create()
+        return webclientWithTimeOut(3)
                 .get()
                 .uri(externalUrl)
                 .retrieve()
                 .bodyToMono(String.class);
     }
+
+	private WebClient webclientWithTimeOut(long seconds) {
+		final HttpClient client = HttpClient.create()
+				.responseTimeout(Duration.ofSeconds(seconds));
+		return WebClient.builder()
+				.clientConnector(new ReactorClientHttpConnector(client))
+				.build();
+	}
 
 	public String parsing(JsonNode jsonObject) {
 		final JsonNode translatedText = jsonObject.findValue(TRANSLATED_TEXT_IN_JSON);

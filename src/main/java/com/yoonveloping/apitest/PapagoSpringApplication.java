@@ -13,6 +13,6 @@ public class PapagoSpringApplication {
 			args);
 
 		WebclientController webclientController = ctx.getBean(WebclientController.class);
-		webclientController.doTest();
+		webclientController.doTranslate("가져오다");
 	}
 }

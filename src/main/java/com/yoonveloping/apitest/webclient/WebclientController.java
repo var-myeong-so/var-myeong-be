@@ -3,7 +3,8 @@ package com.yoonveloping.apitest.webclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yoonveloping.apitest.Secret;
+import com.yoonveloping.apitest.sample.SampleController;
+import java.util.Objects;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -17,20 +18,22 @@ import reactor.core.publisher.Mono;
 @RestController
 public class WebclientController {
 
-	private static final String TRANSLATED_TEXT_IN_JSON = "translatedText";
-	private static final String TEST_API = "https://07217c92-4b0c-45fc-9454-e34a17088a2f.mock.pstmn.io/hello";
-	private static final String PAPAGO_API_URI = "https://openapi.naver.com/v1/papago/n2mt";
-	private static final String HEADER_ID_KEY = "X-Naver-Client-Id";
-	private static final String HEADER_SECRET_KEY = "X-Naver-Client-Secret";
+    private static final String TRANSLATED_TEXT_IN_JSON = "translatedText";
+    private static final String PAPAGO_API_URI = "https://openapi.naver.com/v1/papago/n2mt";
+    private static final String HEADER_ID_KEY = "X-Naver-Client-Id";
+    private static final String HEADER_SECRET_KEY = "X-Naver-Client-Secret";
 
-	@GetMapping("/test")
-	public Mono<String> doTest() {
-		WebClient webClient = WebClient.create();
-		return webClient.get()
-			.uri(TEST_API)
-			.retrieve()
-			.bodyToMono(String.class);
-	}
+    @GetMapping("/test")
+    public Mono<String> doTest(@RequestParam(required = false) String externalUrl) {
+        if (Objects.isNull(externalUrl)) {
+            externalUrl = SampleController.SAMPLE_API_PATH;
+        }
+        return WebClient.create()
+                .get()
+                .uri(externalUrl)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
 
 	public String parsing(JsonNode jsonObject) {
 		final JsonNode translatedText = jsonObject.findValue(TRANSLATED_TEXT_IN_JSON);

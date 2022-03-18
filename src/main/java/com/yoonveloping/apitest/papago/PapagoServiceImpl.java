@@ -16,11 +16,15 @@ import java.net.URL;
 import java.util.Map;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
+import reactor.core.publisher.Mono;
 
 @Service
 public class PapagoServiceImpl implements PapagoService {
 
-	private static final String API_URL = "https://openapi.naver.com/v1/papago/n2mt";
+//	private static final String API_URL = "https://openapi.naver.com/v1/papago/n2mt";
+	private static final String API_URL = "https://07217c92-4b0c-45fc-9454-e34a17088a2f.mock.pstmn.io/hello";
 	private static final String TRANSLATED_TEXT_IN_JSON = "translatedText";
 	private final Request requestHeaders;
 
@@ -35,30 +39,61 @@ public class PapagoServiceImpl implements PapagoService {
 	}
 
 	// TODO::WebClient로 리팩토링
+	// 살려줘...
 	@Override
-	public JsonNode post(String originalText) {
-		HttpURLConnection con = connect();
-		String postParams = "source=ko&target=en&text=" + originalText; //원본언어: 한국어 (ko) -> 목적언어: 영어 (en)
-		try {
-			con.setRequestMethod(String.valueOf(HttpMethod.POST));
-			for (Map.Entry<String, String> header : requestHeaders.getRequestHeaders().entrySet()) {
-				con.setRequestProperty(header.getKey(), header.getValue());
-			}
-			con.setDoOutput(true);
-			try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-				wr.write(postParams.getBytes());
-				wr.flush();
-			}
-			int responseCode = con.getResponseCode();
-			if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 응답
-				return readBody(con.getInputStream());
-			}
-			return readBody(con.getErrorStream());
-		} catch (IOException IOE) {
-			throw new RuntimeException("API 요청과 응답 실패", IOE);
-		} finally {
-			con.disconnect();
-		}
+	public Mono<String> post(String originalText) {
+		WebClient build = WebClient.builder()
+//			.defaultHeader("X-Naver-Client-Id", Secret.CLIENT_ID)
+//			.defaultHeader("X-Naver-Client-Secret", Secret.CLIENT_SECRET)
+			.build();
+
+		return build.get()
+			.uri(uriBuilder -> uriBuilder.path(API_URL)
+				.queryParam("source", "ko")
+				.queryParam("target", "en")
+				.queryParam("text", "originalText")
+				.build()
+			)
+			.retrieve()
+			.bodyToMono(String.class);
+//
+//		for (Map.Entry<String, String> header : requestHeaders.getRequestHeaders().entrySet()) {
+//			webClient(header.getKey(), header.getValue());
+//		}
+//
+//		webClient.post()
+//			.header("X-Naver-Client-Id", Secret.CLIENT_ID)
+//			.header("X-Naver-Client-Secret", Secret.CLIENT_SECRET)
+//			.uri(uriBuilder -> uriBuilder.path(API_URL)
+//			.queryParam("source", "ko")
+//			.queryParam("target", "en")
+//			.queryParam("text", "originalText")
+//			.build())
+//			.retrieve();
+//
+//
+//		HttpURLConnection con = connect();
+//		String postParams = "source=ko&target=en&text=" + originalText; //원본언어: 한국어 (ko) -> 목적언어: 영어 (en)
+//		try {
+//			con.setRequestMethod(String.valueOf(HttpMethod.POST));
+//			for (Map.Entry<String, String> header : requestHeaders.getRequestHeaders().entrySet()) {
+//				con.setRequestProperty(header.getKey(), header.getValue());
+//			}
+//			con.setDoOutput(true);
+//			try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+//				wr.write(postParams.getBytes());
+//				wr.flush();
+//			}
+//			int responseCode = con.getResponseCode();
+//			if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 응답
+//				return readBody(con.getInputStream());
+//			}
+//			return readBody(con.getErrorStream());
+//		} catch (IOException IOE) {
+//			throw new RuntimeException("API 요청과 응답 실패", IOE);
+//		} finally {
+//			con.disconnect();
+//		}
 	}
 
 	private HttpURLConnection connect() {

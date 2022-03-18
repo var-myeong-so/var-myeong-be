@@ -11,10 +11,11 @@ public class WebclientController {
 	@GetMapping("/test")
 	public Mono<String> doTest() {
 		WebClient webClient = WebClient.create();
-		return webClient.get()
-			.uri("http://localhost:8080/webclient/test-create")
+		Mono<String> stringMono = webClient.get()
+			.uri("https://07217c92-4b0c-45fc-9454-e34a17088a2f.mock.pstmn.io/hello")
 			.retrieve()
 			.bodyToMono(String.class);
+		return stringMono;
 	}
 
 }

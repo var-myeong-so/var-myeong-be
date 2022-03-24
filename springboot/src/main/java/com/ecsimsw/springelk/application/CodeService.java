@@ -37,8 +37,12 @@ public class CodeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Code> findByKeyword(String regex) {
-        List<Code> codes = codeRepository.findCodeByContentRegex(regex);
-        return codes;
+    public List<Code> findAllByContentRegex(String regex) {
+        return codeRepository.findCodeByContentRegex(regex);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Code> findAllByContentKeyword(String keyword) {
+        return codeRepository.findCodeByContentContaining(keyword);
     }
 }

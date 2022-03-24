@@ -6,6 +6,9 @@ import com.ecsimsw.springelk.domain.Language;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class CodeService {
 
@@ -16,7 +19,7 @@ public class CodeService {
     }
 
     @Transactional
-    public Code create(Language language, String path, String className,String content) {
+    public Code create(Language language, String path, String className, String content) {
         final Code code = new Code(language, path, className, content);
         return codeRepository.save(code);
     }
@@ -24,5 +27,18 @@ public class CodeService {
     @Transactional
     public void deleteAll() {
         codeRepository.deleteAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Code> findAll() {
+        List<Code> codes = new ArrayList<>();
+        codeRepository.findAll().forEach(codes::add);
+        return codes;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Code> findByKeyword(String regex) {
+        List<Code> codes = codeRepository.findCodeByContentRegex(regex);
+        return codes;
     }
 }

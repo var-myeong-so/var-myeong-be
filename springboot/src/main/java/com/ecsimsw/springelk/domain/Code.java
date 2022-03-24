@@ -66,4 +66,15 @@ public class Code {
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+	@Override
+	public String toString() {
+		return "Code{\n" +
+				"id='" + id + "\n" +
+				", language=" + language + "\n"+
+				", path='" + path + "\n" +
+				", className='" + className + "\n" +
+				", content='" + content + "\n" +
+				"}\n";
+	}
 }

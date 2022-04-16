@@ -1,5 +1,6 @@
 package com.varmyeongso.varnames.domain;
 
+import java.util.List;
 import javax.persistence.*;
 
 @Entity
@@ -55,5 +56,9 @@ public class Code {
 
     public String getCode() {
         return code;
+    }
+
+    public List<String> parse(String target) {
+        return null;
     }
 }

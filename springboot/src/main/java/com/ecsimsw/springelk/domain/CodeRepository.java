@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface CodeRepository extends ElasticsearchRepository<Code, String> {
 
-    List<Code> findCodeByContentContaining(String keyword);
+	List<Code> findCodeByContentContaining(String keyword);
 
-    List<Code> findCodeByContentRegex(String regex);
+	List<Code> findCodeByContentRegex(String regex);
+
+	long countByClassName(String className);
 }

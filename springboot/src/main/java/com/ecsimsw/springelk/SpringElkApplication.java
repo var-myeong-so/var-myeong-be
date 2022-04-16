@@ -22,23 +22,22 @@ public class SpringElkApplication {
 @Component
 class TestDummy {
 
-    private static final String content = "private String id;\n"
+    private static final String content = "package com.ecsimsw.springelk.domain;\n"
         + "\n"
-        + "\tprivate Language language;\n"
+        + "import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;\n"
         + "\n"
-        + "\tpublic Code(Language language) {\n"
-        + "\t\tthis.language = language;\n"
-        + "\t}\n"
+        + "import java.util.List;\n"
         + "\n"
-        + "\tpublic String getId() {\n"
-        + "\t\treturn id;\n"
-        + "\t}\n"
+        + "public interface CodeRepository extends ElasticsearchRepository<Code, String> {\n"
         + "\n"
-        + "\tpublic void setId(String id) {\n"
-        + "\t\tthis.id = id;\n"
-        + "\t}";
+        + "\tList<Code> findCodeByContentContaining(String keyword);\n"
+        + "\n"
+        + "\tList<Code> findCodeByContentRegex(String regex);\n"
+        + "\n"
+        + "\tlong countByClassName(String className);\n"
+        + "}\n";
 
-    private static final String className = "Code";
+    private static final String className = "CodeRepository";
 
     @Autowired
     private CodeService codeService;

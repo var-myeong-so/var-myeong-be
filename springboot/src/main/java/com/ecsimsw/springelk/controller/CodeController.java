@@ -11,15 +11,25 @@ import java.util.List;
 @RestController
 public class CodeController {
 
-    private final CodeService codeService;
+	private final CodeService codeService;
 
-    public CodeController(CodeService codeService) {
-        this.codeService = codeService;
-    }
+	public CodeController(CodeService codeService) {
+		this.codeService = codeService;
+	}
 
-    // ex, localhost:8080/content?regex=String
-    @GetMapping
-    public List<Code> findAllByContent(@RequestParam String regex) {
-        return codeService.findAllByContentRegex(regex);
-    }
+	// ex, localhost:8080/content?regex=String
+	@GetMapping("/content")
+	public List<Code> findAllByContent(@RequestParam String regex) {
+		return codeService.findAllByContentRegex(regex);
+	}
+
+	@GetMapping("/count")
+	public long countClassName(@RequestParam String className) {
+		return codeService.countByClassName(className);
+	}
+
+	@GetMapping("count/all")
+	public long countAll() {
+		return codeService.countAll();
+	}
 }

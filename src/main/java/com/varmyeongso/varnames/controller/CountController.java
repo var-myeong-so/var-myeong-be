@@ -1,6 +1,7 @@
 package com.varmyeongso.varnames.controller;
 
-import com.varmyeongso.varnames.domain.CodeRepository;
+import com.varmyeongso.varnames.dto.CounterResponse;
+import com.varmyeongso.varnames.service.CountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,23 +12,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/count")
 public class CountController {
 
-	private static final String JAVA_EXTENSION = ".java";
-
 	@Autowired
-	private CodeRepository codeRepository;
+	private CountService countService;
 
 	@GetMapping
-	public long countClassName(@RequestParam String className) {
-		String baseName = addExtension(className);
-		return codeRepository.countByClassName(baseName);
+	public CounterResponse countClassName(@RequestParam String target) {
+		long numberOfCodesByVariableName = countService.countVariableName(target);
+		long numberOfCodesByClassName = countService.countClassName(target);
+		long totalNumber = numberOfCodesByVariableName + numberOfCodesByClassName;
+		return new CounterResponse(
+			totalNumber,
+			numberOfCodesByVariableName,
+			numberOfCodesByClassName
+			);
 	}
 
 	@GetMapping("/all")
 	public long countAll() {
-		return codeRepository.count();
-	}
-
-	private String addExtension(String className) {
-		return className + JAVA_EXTENSION;
+		return countService.countAllCodes();
 	}
 }

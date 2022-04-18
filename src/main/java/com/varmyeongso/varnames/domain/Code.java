@@ -61,4 +61,8 @@ public class Code {
     public List<String> parse(String target) {
         return null;
     }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 }

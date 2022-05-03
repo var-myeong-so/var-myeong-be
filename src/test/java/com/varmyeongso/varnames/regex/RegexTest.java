@@ -16,8 +16,6 @@ public class RegexTest {
 
     public final String r1= "(?<=int |float |String |double )([a-zA-Z_]\\w*)(?=,|;|\\s)|([a-zA-Z_]\\w*)(?=,|;|\\s*=)";
     public final String r2 = "[A-Z][a-zA-Z0-9_]*";
-    // '대문자 시작 영단어 ' [단어하나] ';' or ' =' or '='
-
 
     @DisplayName("대문자 시작, 영어 + 숫자 + _을 포함하는 단어 확인")
     @Test
@@ -31,9 +29,9 @@ public class RegexTest {
     @DisplayName(" 대문자 시작, 영어 + 숫자 + _을 포함하는 단어의 공백 뒷부분을 찾는다.")
     @Test
     public void afterBlank() {
-        final String varName = "hidd";
-        final String regex = "[A-Z][a-zA-Z0-9_][\\s]([a-zA-Z0-9_]*)(?=[\\s;=])";
-        final Matcher matcher = Pattern.compile(regex).matcher("Isdf9 number = 54;");
+        final String varName = "hi";
+        final String regex = "(?<=([A-Z][a-zA-Z0-9_][\\s]))([a-zA-Z0-9_]*)(?=(;|\\s=))";
+        final Matcher matcher = Pattern.compile(regex).matcher("Is hi = 54;");
         assertThat(matcher.find()).isTrue();
         assertThat(matcher.group()).isEqualTo(varName);
     }
@@ -43,15 +41,6 @@ public class RegexTest {
     public void nextWord() {
         final String varName = "Heee324_";
         final Matcher matcher = Pattern.compile(".+(=?[;|\\$=])").matcher("Heee324_=");
-        assertThat(matcher.find()).isTrue();
-        assertThat(matcher.group()).isEqualTo(varName);
-    }
-
-
-    @Test
-    public void tempTest() {
-        final String varName = "Heee324";
-        final Matcher matcher = Pattern.compile(r2).matcher("Heee324");
         assertThat(matcher.find()).isTrue();
         assertThat(matcher.group()).isEqualTo(varName);
     }

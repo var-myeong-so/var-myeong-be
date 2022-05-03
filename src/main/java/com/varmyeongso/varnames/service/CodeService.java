@@ -43,6 +43,10 @@ public class CodeService {
 		return parse(codes);
 	}
 
+	public void saveCodes(List<Code> codes) {
+		codes.forEach(codeRepository::save);
+	}
+
 	private List<Code> parse(List<Code> code) {
 		code.forEach(this::parseCode);
 		return code;

@@ -1,52 +1,102 @@
 package com.varmyeongso.varnames.service;
 
 import com.varmyeongso.varnames.domain.Code;
+import com.varmyeongso.varnames.domain.CodeRegex;
 import com.varmyeongso.varnames.domain.CodeRepository;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.mockito.BDDMockito.given;
+import org.mockito.stubbing.Stubber;
 
 @ExtendWith(MockitoExtension.class)
 class CodeServiceTest {
 
+	@InjectMocks
+	private CodeService codeService;
+
 	@Mock
 	private CodeRepository codeRepository;
 
-	@InjectMocks
-	private CodeService codeService = new CodeService(this.codeRepository);
+	@DisplayName("클래스명 파싱 성공")
+	@Test
+	void parseTest() {
+		List<Code> codes = createCodes(1);
+		//given
+		CodeRegex classLineRegex = CodeRegex.CLASS_LINE_REGEX;
+		String regex = classLineRegex.getRegex();
+		List<String> code = List.of(codes.get(0).getCode().split("\n"));
+		//when
+		int i = 0;
+		for (String line : code) {
+			if (Pattern.matches(regex, line)) {
+				i = code.indexOf(line);
+				System.out.println("code: "+code.get(i));
+				return;
+			}
+		}
+		//then
+		Assertions.assertThat(code.get(i).contains("class")).isEqualTo(true);
+	}
 
+	@DisplayName("ㅈㅣㄴ환")
+	@Test
+	void parseTestFuck() {
+//
+//		List<Code> codes = createCodes(1);
+//		//given
+//		CodeRegex classLineRegex = CodeRegex.JINHWAN_REGEX;
+//		String regex = classLineRegex.getRegex();
+//		List<String> code = List.of(codes.get(0).getCode().split("\n"));
+//		//when
+//		int i = 0;
+//		for (String line : code) {
+//			final Matcher matcher = Pattern.compile(regex).matcher(line);
+//			if (matcher.find()) {
+//				String group = matcher.group();
+//				System.out.println("group = " + group);
+//			}
+//		}
+//		//then
+//		Assertions.assertThat(code.get(i).contains("class")).isEqualTo(true);
+	}
+
+	@DisplayName("파싱한 코드의 개수 확인")
 	@Test
 	void test() {
 		List<Code> codes = createCodes(1);
+		List<Code> springApplicationBuilder = codeService.searchCodesByAll("SpringApplicationBuilder");
+		String code1 = springApplicationBuilder.get(0).getCode();
+		//given
+		String keyword = "class";
+		String target = "SpringApplicationBuilder";
+		Stubber stubber = Mockito.doReturn(codeService.searchCodesByClassName(keyword, target));
 
-		try {
-			Method parse = codeService.getClass()
-				.getDeclaredMethod("parse", List.class, String.class);
-			parse.setAccessible(true);
-			List<Code> invoke = (List<Code>) parse.invoke(codeService, codes,
-				"public SpringApplication build(String... args) {");
-			for (Code code : invoke) {
-				String code1 = code.getCode();
-				System.out.println("code1 = " + code1);
-			}
-		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-			e.printStackTrace();
+//		Mockito.when(codeService.searchCodesByClassName(keyword, target)).then(codes);
+		Mockito.when(codeRepository.findCodesByClassName(target)).thenReturn(codes);
+
+
+		//when
+		List<Code> codesByClassName = codeService.searchCodesByClassName(keyword, target);
+		//then
+		for (Code code : codesByClassName) {
+			String className = code.getClassName();
+			Assertions.assertThat(className).isEqualTo(target);
 		}
 	}
 
 	List<Code> createCodes(int count) {
-
 		final List<Code> codes = new ArrayList<>();
 
-		for(int i =0; i< count; i++) {
+		for (int i = 0; i < count; i++) {
 			codes.add(makeCode());
 		}
 
@@ -90,7 +140,8 @@ class CodeServiceTest {
 				"import java.util.Set;\n" +
 				"import java.util.concurrent.atomic.AtomicBoolean;\n" +
 				"\n" +
-				"import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;\n" +
+				"import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;\n"
+				+
 				"import org.springframework.beans.factory.support.BeanNameGenerator;\n" +
 				"import org.springframework.boot.ApplicationContextFactory;\n" +
 				"import org.springframework.boot.Banner;\n" +
@@ -110,19 +161,24 @@ class CodeServiceTest {
 				"import org.springframework.util.StringUtils;\n" +
 				"\n" +
 				"/**\n" +
-				" * Builder for {@link SpringApplication} and {@link ApplicationContext} instances with\n" +
-				" * convenient fluent API and context hierarchy support. Simple example of a context\n" +
+				" * Builder for {@link SpringApplication} and {@link ApplicationContext} instances with\n"
+				+
+				" * convenient fluent API and context hierarchy support. Simple example of a context\n"
+				+
 				" * hierarchy:\n" +
 				" *\n" +
 				" * <pre class=\"code\">\n" +
-				" * new SpringApplicationBuilder(ParentConfig.class).child(ChildConfig.class).run(args);\n" +
+				" * new SpringApplicationBuilder(ParentConfig.class).child(ChildConfig.class).run(args);\n"
+				+
 				" * </pre>\n" +
 				" *\n" +
-				" * Another common use case is setting active profiles and default properties to set up the\n" +
+				" * Another common use case is setting active profiles and default properties to set up the\n"
+				+
 				" * environment for an application:\n" +
 				" *\n" +
 				" * <pre class=\"code\">\n" +
-				" * new SpringApplicationBuilder(Application.class).profiles(&quot;server&quot;)\n" +
+				" * new SpringApplicationBuilder(Application.class).profiles(&quot;server&quot;)\n"
+				+
 				" * \t\t.properties(&quot;transport=local&quot;).run(args);\n" +
 				" * </pre>\n" +
 				" *\n" +
@@ -161,20 +217,24 @@ class CodeServiceTest {
 				"\t\tthis(null, sources);\n" +
 				"\t}\n" +
 				"\n" +
-				"\tpublic SpringApplicationBuilder(ResourceLoader resourceLoader, Class<?>... sources) {\n" +
+				"\tpublic SpringApplicationBuilder(ResourceLoader resourceLoader, Class<?>... sources) {\n"
+				+
 				"\t\tthis.application = createSpringApplication(resourceLoader, sources);\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Creates a new {@link SpringApplication} instance from the given sources using the\n" +
-				"\t * given {@link ResourceLoader}. Subclasses may override in order to provide a custom\n" +
+				"\t * Creates a new {@link SpringApplication} instance from the given sources using the\n"
+				+
+				"\t * given {@link ResourceLoader}. Subclasses may override in order to provide a custom\n"
+				+
 				"\t * subclass of {@link SpringApplication}.\n" +
 				"\t * @param resourceLoader the resource loader (can be null)\n" +
 				"\t * @param sources the sources\n" +
 				"\t * @return the {@link SpringApplication} instance\n" +
 				"\t * @since 2.6.0\n" +
 				"\t */\n" +
-				"\tprotected SpringApplication createSpringApplication(ResourceLoader resourceLoader, Class<?>... sources) {\n" +
+				"\tprotected SpringApplication createSpringApplication(ResourceLoader resourceLoader, Class<?>... sources) {\n"
+				+
 				"\t\treturn new SpringApplication(resourceLoader, sources);\n" +
 				"\t}\n" +
 				"\n" +
@@ -195,8 +255,10 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Create an application context (and its parent if specified) with the command line\n" +
-				"\t * args provided. The parent is run first with the same arguments if has not yet been\n" +
+				"\t * Create an application context (and its parent if specified) with the command line\n"
+				+
+				"\t * args provided. The parent is run first with the same arguments if has not yet been\n"
+				+
 				"\t * started.\n" +
 				"\t * @param args the command line arguments\n" +
 				"\t * @return an application context created from the current state\n" +
@@ -222,12 +284,14 @@ class CodeServiceTest {
 				"\t\t\tif (!this.registerShutdownHookApplied) {\n" +
 				"\t\t\t\tthis.application.setRegisterShutdownHook(false);\n" +
 				"\t\t\t}\n" +
-				"\t\t\tinitializers(new ParentContextApplicationContextInitializer(this.parent.run(args)));\n" +
+				"\t\t\tinitializers(new ParentContextApplicationContextInitializer(this.parent.run(args)));\n"
+				+
 				"\t\t}\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Returns a fully configured {@link SpringApplication} that is ready to run.\n" +
+				"\t * Returns a fully configured {@link SpringApplication} that is ready to run.\n"
+				+
 				"\t * @return the fully configured {@link SpringApplication}.\n" +
 				"\t */\n" +
 				"\tpublic SpringApplication build() {\n" +
@@ -235,7 +299,8 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Returns a fully configured {@link SpringApplication} that is ready to run. Any\n" +
+				"\t * Returns a fully configured {@link SpringApplication} that is ready to run. Any\n"
+				+
 				"\t * parent that has been configured will be run with the given {@code args}.\n" +
 				"\t * @param args the parent's args\n" +
 				"\t * @return the fully configured {@link SpringApplication}.\n" +
@@ -247,7 +312,8 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Create a child application with the provided sources. Default args and environment\n" +
+				"\t * Create a child application with the provided sources. Default args and environment\n"
+				+
 				"\t * are copied down into the child, but everything else is a clean sheet.\n" +
 				"\t * @param sources the sources for the application (Spring configuration)\n" +
 				"\t * @return the child application builder\n" +
@@ -261,8 +327,10 @@ class CodeServiceTest {
 				"\t\t\t\t.additionalProfiles(this.additionalProfiles);\n" +
 				"\t\tchild.parent = this;\n" +
 				"\n" +
-				"\t\t// It's not possible if embedded web server are enabled to support web contexts as\n" +
-				"\t\t// parents because the servlets cannot be initialized at the right point in\n" +
+				"\t\t// It's not possible if embedded web server are enabled to support web contexts as\n"
+				+
+				"\t\t// parents because the servlets cannot be initialized at the right point in\n"
+				+
 				"\t\t// lifecycle.\n" +
 				"\t\tweb(WebApplicationType.NONE);\n" +
 				"\n" +
@@ -276,14 +344,16 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Add a parent application with the provided sources. Default args and environment\n" +
+				"\t * Add a parent application with the provided sources. Default args and environment\n"
+				+
 				"\t * are copied up into the parent, but everything else is a clean sheet.\n" +
 				"\t * @param sources the sources for the application (Spring configuration)\n" +
 				"\t * @return the parent builder\n" +
 				"\t */\n" +
 				"\tpublic SpringApplicationBuilder parent(Class<?>... sources) {\n" +
 				"\t\tif (this.parent == null) {\n" +
-				"\t\t\tthis.parent = new SpringApplicationBuilder(sources).web(WebApplicationType.NONE)\n" +
+				"\t\t\tthis.parent = new SpringApplicationBuilder(sources).web(WebApplicationType.NONE)\n"
+				+
 				"\t\t\t\t\t.properties(this.defaultProperties).environment(this.environment);\n" +
 				"\t\t}\n" +
 				"\t\telse {\n" +
@@ -300,7 +370,8 @@ class CodeServiceTest {
 				"\t\t\treturn this.parent;\n" +
 				"\t\t}\n" +
 				"\t\tthrow new IllegalStateException(\n" +
-				"\t\t\t\t\"No parent defined yet (please use the other overloaded parent methods to set one)\");\n" +
+				"\t\t\t\t\"No parent defined yet (please use the other overloaded parent methods to set one)\");\n"
+				+
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
@@ -308,7 +379,8 @@ class CodeServiceTest {
 				"\t * @param parent the parent context\n" +
 				"\t * @return the current builder (not the parent)\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder parent(ConfigurableApplicationContext parent) {\n" +
+				"\tpublic SpringApplicationBuilder parent(ConfigurableApplicationContext parent) {\n"
+				+
 				"\t\tthis.parent = new SpringApplicationBuilder();\n" +
 				"\t\tthis.parent.context = parent;\n" +
 				"\t\tthis.parent.running.set(true);\n" +
@@ -316,10 +388,14 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Create a sibling application (one with the same parent). A side effect of calling\n" +
-				"\t * this method is that the current application (and its parent) are started without\n" +
-				"\t * any arguments if they are not already running. To supply arguments when starting\n" +
-				"\t * the current application and its parent use {@link #sibling(Class[], String...)}\n" +
+				"\t * Create a sibling application (one with the same parent). A side effect of calling\n"
+				+
+				"\t * this method is that the current application (and its parent) are started without\n"
+				+
+				"\t * any arguments if they are not already running. To supply arguments when starting\n"
+				+
+				"\t * the current application and its parent use {@link #sibling(Class[], String...)}\n"
+				+
 				"\t * instead.\n" +
 				"\t * @param sources the sources for the application (Spring configuration)\n" +
 				"\t * @return the new sibling builder\n" +
@@ -329,15 +405,19 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Create a sibling application (one with the same parent). A side effect of calling\n" +
-				"\t * this method is that the current application (and its parent) are started if they\n" +
+				"\t * Create a sibling application (one with the same parent). A side effect of calling\n"
+				+
+				"\t * this method is that the current application (and its parent) are started if they\n"
+				+
 				"\t * are not already running.\n" +
 				"\t * @param sources the sources for the application (Spring configuration)\n" +
-				"\t * @param args the command line arguments to use when starting the current app and its\n" +
+				"\t * @param args the command line arguments to use when starting the current app and its\n"
+				+
 				"\t * parent\n" +
 				"\t * @return the new sibling builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder sibling(Class<?>[] sources, String... args) {\n" +
+				"\tpublic SpringApplicationBuilder sibling(Class<?>[] sources, String... args) {\n"
+				+
 				"\t\treturn runAndExtractParent(args).child(sources);\n" +
 				"\t}\n" +
 				"\n" +
@@ -347,13 +427,15 @@ class CodeServiceTest {
 				"\t * @return the current builder\n" +
 				"\t * @since 2.4.0\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder contextFactory(ApplicationContextFactory factory) {\n" +
+				"\tpublic SpringApplicationBuilder contextFactory(ApplicationContextFactory factory) {\n"
+				+
 				"\t\tthis.application.setApplicationContextFactory(factory);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Add more sources (configuration classes and components) to this application.\n" +
+				"\t * Add more sources (configuration classes and components) to this application.\n"
+				+
 				"\t * @param sources the sources to add\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
@@ -363,7 +445,8 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Flag to explicitly request a specific type of web application. Auto-detected based\n" +
+				"\t * Flag to explicitly request a specific type of web application. Auto-detected based\n"
+				+
 				"\t * on the classpath if not set.\n" +
 				"\t * @param webApplicationType the type of web application\n" +
 				"\t * @return the current builder\n" +
@@ -385,7 +468,8 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Sets the {@link Banner} instance which will be used to print the banner when no\n" +
+				"\t * Sets the {@link Banner} instance which will be used to print the banner when no\n"
+				+
 				"\t * static banner file is provided.\n" +
 				"\t * @param banner the banner to use\n" +
 				"\t * @return the current builder\n" +
@@ -401,7 +485,8 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Sets if the application is headless and should not instantiate AWT. Defaults to\n" +
+				"\t * Sets if the application is headless and should not instantiate AWT. Defaults to\n"
+				+
 				"\t * {@code true} to prevent java icons appearing.\n" +
 				"\t * @param headless if the application is headless\n" +
 				"\t * @return the current builder\n" +
@@ -412,19 +497,22 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Sets if the created {@link ApplicationContext} should have a shutdown hook\n" +
+				"\t * Sets if the created {@link ApplicationContext} should have a shutdown hook\n"
+				+
 				"\t * registered.\n" +
 				"\t * @param registerShutdownHook if the shutdown hook should be registered\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder registerShutdownHook(boolean registerShutdownHook) {\n" +
+				"\tpublic SpringApplicationBuilder registerShutdownHook(boolean registerShutdownHook) {\n"
+				+
 				"\t\tthis.registerShutdownHookApplied = true;\n" +
 				"\t\tthis.application.setRegisterShutdownHook(registerShutdownHook);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Fixes the main application class that is used to anchor the startup messages.\n" +
+				"\t * Fixes the main application class that is used to anchor the startup messages.\n"
+				+
 				"\t * @param mainApplicationClass the class to use.\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
@@ -434,37 +522,44 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Flag to indicate that command line arguments should be added to the environment.\n" +
+				"\t * Flag to indicate that command line arguments should be added to the environment.\n"
+				+
 				"\t * @param addCommandLineProperties the flag to set. Default true.\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder addCommandLineProperties(boolean addCommandLineProperties) {\n" +
+				"\tpublic SpringApplicationBuilder addCommandLineProperties(boolean addCommandLineProperties) {\n"
+				+
 				"\t\tthis.application.setAddCommandLineProperties(addCommandLineProperties);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Flag to indicate if the {@link ApplicationConversionService} should be added to the\n" +
+				"\t * Flag to indicate if the {@link ApplicationConversionService} should be added to the\n"
+				+
 				"\t * application context's {@link Environment}.\n" +
 				"\t * @param addConversionService if the conversion service should be added.\n" +
 				"\t * @return the current builder\n" +
 				"\t * @since 2.1.0\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder setAddConversionService(boolean addConversionService) {\n" +
+				"\tpublic SpringApplicationBuilder setAddConversionService(boolean addConversionService) {\n"
+				+
 				"\t\tthis.application.setAddConversionService(addConversionService);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Adds {@link BootstrapRegistryInitializer} instances that can be used to initialize\n" +
+				"\t * Adds {@link BootstrapRegistryInitializer} instances that can be used to initialize\n"
+				+
 				"\t * the {@link BootstrapRegistry}.\n" +
-				"\t * @param bootstrapRegistryInitializer the bootstrap registry initializer to add\n" +
+				"\t * @param bootstrapRegistryInitializer the bootstrap registry initializer to add\n"
+				+
 				"\t * @return the current builder\n" +
 				"\t * @since 2.4.5\n" +
 				"\t */\n" +
 				"\tpublic SpringApplicationBuilder addBootstrapRegistryInitializer(\n" +
 				"\t\t\tBootstrapRegistryInitializer bootstrapRegistryInitializer) {\n" +
-				"\t\tthis.application.addBootstrapRegistryInitializer(bootstrapRegistryInitializer);\n" +
+				"\t\tthis.application.addBootstrapRegistryInitializer(bootstrapRegistryInitializer);\n"
+				+
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
@@ -474,14 +569,16 @@ class CodeServiceTest {
 				"\t * @return the current builder\n" +
 				"\t * @since 2.2\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder lazyInitialization(boolean lazyInitialization) {\n" +
+				"\tpublic SpringApplicationBuilder lazyInitialization(boolean lazyInitialization) {\n"
+				+
 				"\t\tthis.application.setLazyInitialization(lazyInitialization);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
 				"\t * Default properties for the environment in the form {@code key=value} or\n" +
-				"\t * {@code key:value}. Multiple calls to this method are cumulative and will not clear\n" +
+				"\t * {@code key:value}. Multiple calls to this method are cumulative and will not clear\n"
+				+
 				"\t * any previously set properties.\n" +
 				"\t * @param defaultProperties the properties to set.\n" +
 				"\t * @return the current builder\n" +
@@ -508,14 +605,16 @@ class CodeServiceTest {
 				"\t\tfor (String candidate : candidates) {\n" +
 				"\t\t\tint candidateIndex = property.indexOf(candidate);\n" +
 				"\t\t\tif (candidateIndex > 0) {\n" +
-				"\t\t\t\tindex = (index != -1) ? Math.min(index, candidateIndex) : candidateIndex;\n" +
+				"\t\t\t\tindex = (index != -1) ? Math.min(index, candidateIndex) : candidateIndex;\n"
+				+
 				"\t\t\t}\n" +
 				"\t\t}\n" +
 				"\t\treturn index;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Default properties for the environment.Multiple calls to this method are cumulative\n" +
+				"\t * Default properties for the environment.Multiple calls to this method are cumulative\n"
+				+
 				"\t * and will not clear any previously set properties.\n" +
 				"\t * @param defaultProperties the properties to set.\n" +
 				"\t * @return the current builder\n" +
@@ -553,29 +652,35 @@ class CodeServiceTest {
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Add to the active Spring profiles for this app (and its parent and children).\n" +
+				"\t * Add to the active Spring profiles for this app (and its parent and children).\n"
+				+
 				"\t * @param profiles the profiles to add.\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
 				"\tpublic SpringApplicationBuilder profiles(String... profiles) {\n" +
 				"\t\tthis.additionalProfiles.addAll(Arrays.asList(profiles));\n" +
-				"\t\tthis.application.setAdditionalProfiles(StringUtils.toStringArray(this.additionalProfiles));\n" +
+				"\t\tthis.application.setAdditionalProfiles(StringUtils.toStringArray(this.additionalProfiles));\n"
+				+
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
-				"\tprivate SpringApplicationBuilder additionalProfiles(Collection<String> additionalProfiles) {\n" +
+				"\tprivate SpringApplicationBuilder additionalProfiles(Collection<String> additionalProfiles) {\n"
+				+
 				"\t\tthis.additionalProfiles = new LinkedHashSet<>(additionalProfiles);\n" +
-				"\t\tthis.application.setAdditionalProfiles(StringUtils.toStringArray(this.additionalProfiles));\n" +
+				"\t\tthis.application.setAdditionalProfiles(StringUtils.toStringArray(this.additionalProfiles));\n"
+				+
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Bean name generator for automatically generated bean names in the application\n" +
+				"\t * Bean name generator for automatically generated bean names in the application\n"
+				+
 				"\t * context.\n" +
 				"\t * @param beanNameGenerator the generator to set.\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder beanNameGenerator(BeanNameGenerator beanNameGenerator) {\n" +
+				"\tpublic SpringApplicationBuilder beanNameGenerator(BeanNameGenerator beanNameGenerator) {\n"
+				+
 				"\t\tthis.application.setBeanNameGenerator(beanNameGenerator);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
@@ -585,55 +690,66 @@ class CodeServiceTest {
 				"\t * @param environment the environment to set.\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder environment(ConfigurableEnvironment environment) {\n" +
+				"\tpublic SpringApplicationBuilder environment(ConfigurableEnvironment environment) {\n"
+				+
 				"\t\tthis.application.setEnvironment(environment);\n" +
 				"\t\tthis.environment = environment;\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Prefix that should be applied when obtaining configuration properties from the\n" +
+				"\t * Prefix that should be applied when obtaining configuration properties from the\n"
+				+
 				"\t * system environment.\n" +
 				"\t * @param environmentPrefix the environment property prefix to set\n" +
 				"\t * @return the current builder\n" +
 				"\t * @since 2.5.0\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder environmentPrefix(String environmentPrefix) {\n" +
+				"\tpublic SpringApplicationBuilder environmentPrefix(String environmentPrefix) {\n"
+				+
 				"\t\tthis.application.setEnvironmentPrefix(environmentPrefix);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * {@link ResourceLoader} for the application context. If a custom class loader is\n" +
+				"\t * {@link ResourceLoader} for the application context. If a custom class loader is\n"
+				+
 				"\t * needed, this is where it would be added.\n" +
 				"\t * @param resourceLoader the resource loader to set.\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder resourceLoader(ResourceLoader resourceLoader) {\n" +
+				"\tpublic SpringApplicationBuilder resourceLoader(ResourceLoader resourceLoader) {\n"
+				+
 				"\t\tthis.application.setResourceLoader(resourceLoader);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Add some initializers to the application (applied to the {@link ApplicationContext}\n" +
+				"\t * Add some initializers to the application (applied to the {@link ApplicationContext}\n"
+				+
 				"\t * before any bean definitions are loaded).\n" +
 				"\t * @param initializers some initializers to add\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder initializers(ApplicationContextInitializer<?>... initializers) {\n" +
+				"\tpublic SpringApplicationBuilder initializers(ApplicationContextInitializer<?>... initializers) {\n"
+				+
 				"\t\tthis.application.addInitializers(initializers);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Add some listeners to the application (listening for SpringApplication events as\n" +
-				"\t * well as regular Spring events once the context is running). Any listeners that are\n" +
+				"\t * Add some listeners to the application (listening for SpringApplication events as\n"
+				+
+				"\t * well as regular Spring events once the context is running). Any listeners that are\n"
+				+
 				"\t * also {@link ApplicationContextInitializer} will be added to the\n" +
-				"\t * {@link #initializers(ApplicationContextInitializer...) initializers} automatically.\n" +
+				"\t * {@link #initializers(ApplicationContextInitializer...) initializers} automatically.\n"
+				+
 				"\t * @param listeners some listeners to add\n" +
 				"\t * @return the current builder\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder listeners(ApplicationListener<?>... listeners) {\n" +
+				"\tpublic SpringApplicationBuilder listeners(ApplicationListener<?>... listeners) {\n"
+				+
 				"\t\tthis.application.addListeners(listeners);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
@@ -645,20 +761,24 @@ class CodeServiceTest {
 				"\t * @return the current builder\n" +
 				"\t * @since 2.4.0\n" +
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder applicationStartup(ApplicationStartup applicationStartup) {\n" +
+				"\tpublic SpringApplicationBuilder applicationStartup(ApplicationStartup applicationStartup) {\n"
+				+
 				"\t\tthis.application.setApplicationStartup(applicationStartup);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +
 				"\n" +
 				"\t/**\n" +
-				"\t * Whether to allow circular references between beans and automatically try to resolve\n" +
+				"\t * Whether to allow circular references between beans and automatically try to resolve\n"
+				+
 				"\t * them.\n" +
 				"\t * @param allowCircularReferences whether circular references are allowed\n" +
 				"\t * @return the current builder\n" +
 				"\t * @since 2.6.0\n" +
-				"\t * @see AbstractAutowireCapableBeanFactory#setAllowCircularReferences(boolean)\n" +
+				"\t * @see AbstractAutowireCapableBeanFactory#setAllowCircularReferences(boolean)\n"
+				+
 				"\t */\n" +
-				"\tpublic SpringApplicationBuilder allowCircularReferences(boolean allowCircularReferences) {\n" +
+				"\tpublic SpringApplicationBuilder allowCircularReferences(boolean allowCircularReferences) {\n"
+				+
 				"\t\tthis.application.setAllowCircularReferences(allowCircularReferences);\n" +
 				"\t\treturn this;\n" +
 				"\t}\n" +

@@ -1,10 +1,12 @@
 package com.varmyeongso.varnames.crawling;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CrawlingService {
 
@@ -35,6 +37,18 @@ public class CrawlingService {
 			p.waitFor();
 			System.out.println("exit: " + p.exitValue());
 			p.destroy();
+		}
+	}
+
+	public void findJavaFiles(String path) {
+		File directory = new File(path);
+		List<File> files = List.of(Objects.requireNonNull(directory.listFiles()));
+		for (File file : files) {
+			if (file.isDirectory()) {
+				findJavaFiles(file.getPath());
+			} else if (file.getName().endsWith("java")) {
+				System.out.println("file = " + file);
+			}
 		}
 	}
 }

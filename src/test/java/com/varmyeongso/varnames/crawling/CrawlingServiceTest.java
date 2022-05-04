@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 class CrawlingServiceTest {
 
 	private final CrawlingService crawlingService = new CrawlingService();
+	private static final String CLONE_PATH = "src/main/resources/gitsources";
 
 	@DisplayName("파일 읽기 테스트")
 	@Test
@@ -24,5 +25,11 @@ class CrawlingServiceTest {
 	@Test
 	void gitCloneTest() throws IOException, InterruptedException {
 		crawlingService.gitClone();
+	}
+
+	@DisplayName("자바 파일 찾기 테스트")
+	@Test
+	void findJavaFilesTest() {
+		crawlingService.findJavaFiles(CLONE_PATH);
 	}
 }

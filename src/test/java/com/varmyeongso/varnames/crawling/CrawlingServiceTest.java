@@ -1,5 +1,6 @@
 package com.varmyeongso.varnames.crawling;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -30,6 +31,13 @@ class CrawlingServiceTest {
 	@DisplayName("자바 파일 찾기 테스트")
 	@Test
 	void findJavaFilesTest() {
-		crawlingService.findJavaFiles(CLONE_PATH);
+		List<File> javaFiles = crawlingService.findJavaFiles(CLONE_PATH);
+		javaFiles.forEach(System.out::println);
+	}
+
+	@DisplayName("자바 파일 코드 읽기 테스트")
+	@Test
+	void readCodeTest() throws IOException {
+		crawlingService.readCode(CLONE_PATH);
 	}
 }

@@ -5,13 +5,15 @@ import com.ecsimsw.springelk.domain.CodeRepository;
 import com.ecsimsw.springelk.domain.Variable;
 import com.ecsimsw.springelk.domain.VariableRepository;
 import com.ecsimsw.springelk.dto.CodeFile;
-import org.springframework.data.domain.Page;
+import com.ecsimsw.springelk.dto.CodeResponse;
+import com.ecsimsw.springelk.dto.VariableResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -25,15 +27,24 @@ public class AdminService {
     }
 
     @Transactional
-    public void storeCode(CodeFile codeFile) {
-        final Code code = codeRepository.save(codeFile.asCode());
-        variableRepository.saveAll(code.variableNames());
+    public List<CodeResponse> storeCode(List<CodeFile> codeFiles) {
+        return codeFiles.stream()
+                .map(this::storeCode)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void storeVariableInCode(String codeId, String name) {
+    public CodeResponse storeCode(CodeFile codeFile) {
+        final Code code = codeRepository.save(codeFile.asCode());
+        variableRepository.saveAll(code.variableNames());
+        return CodeResponse.of(code);
+    }
+
+    @Transactional
+    public VariableResponse storeVariableInCode(String codeId, String name) {
         final Code code = findCodeById(codeId);
-        variableRepository.save(new Variable(code.id(), code.language(), code.star(), name));
+        final Variable saved = variableRepository.save(new Variable(code.id(), code.language(), code.star(), name));
+        return VariableResponse.of(saved);
     }
 
     @Transactional
@@ -53,19 +64,21 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public List<Code> searchAllCode(Pageable pageable) {
-        if(!Objects.isNull(pageable)) {
-            return codeRepository.findAll(pageable).toList();
+    public List<CodeResponse> searchAllCode(Pageable pageable) {
+        if (!Objects.isNull(pageable)) {
+            final List<Code> codes = codeRepository.findAll(pageable).toList();
+            return CodeResponse.listOf(codes);
         }
-        return codeRepository.findAll();
+        return CodeResponse.listOf(codeRepository.findAll());
     }
 
     @Transactional
-    public List<Variable> searchAllVariable(Pageable pageable) {
-        if(!Objects.isNull(pageable)) {
-            return variableRepository.findAll(pageable).toList();
+    public List<VariableResponse> searchAllVariable(Pageable pageable) {
+        if (!Objects.isNull(pageable)) {
+            final List<Variable> variables = variableRepository.findAll(pageable).toList();
+            return VariableResponse.listOf(variables);
         }
-        return variableRepository.findAll();
+        return VariableResponse.listOf(variableRepository.findAll());
     }
 
     private Code findCodeById(String codeId) {

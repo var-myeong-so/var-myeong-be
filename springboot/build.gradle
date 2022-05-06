@@ -13,13 +13,17 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.data:spring-data-elasticsearch:4.3.0'
-    // The compatibility between Spring Data Elasticsearch, Elasticsearch client drivers and Spring Boot versions
-    // https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#preface.versions
 
+    // spring boot, spring mvc
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // elasticsearch
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.3.0'
+
+    // swagger3.0
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 }
 
 tasks.named('test') {

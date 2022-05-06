@@ -2,6 +2,7 @@ package com.ecsimsw.springelk;
 
 import com.ecsimsw.springelk.application.CodeService;
 import com.ecsimsw.springelk.domain.Language;
+import com.ecsimsw.springelk.dto.CodeFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,29 +20,76 @@ public class SpringElkApplication {
 
 @Component
 class TestDummy {
-
-    private static final String content = "package com.ecsimsw.springelk.domain;\n"
-            + "\n"
-            + "import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;\n"
-            + "\n"
-            + "import java.util.List;\n"
-            + "\n"
-            + "public interface CodeRepository extends ElasticsearchRepository<Code, String> {\n"
-            + "\n"
-            + "\tList<Code> findCodeByContentContaining(String keyword);\n"
-            + "\n"
-            + "\tList<Code> findCodeByContentRegex(String regex);\n"
-            + "\n"
-            + "\tlong countByClassName(String className);\n"
-            + "}\n";
-
-    private static final String className = "CodeRepository";
+    private static final String path = "https://github.com/ecsimsw/fast-crud/blob/develop/src/main/java/com/ecsimsw/fastcrud/TargetEntity.java";
+    private static final String className = "TargetEntity";
+    private static final int star = 10;
+    private static final String content = "package com.ecsimsw.fastcrud;\n" +
+            "\n" +
+            "import com.ecsimsw.fastcrud.annotation.CRUD;\n" +
+            "import com.ecsimsw.fastcrud.annotation.CrudType;\n" +
+            "import com.ecsimsw.fastcrud.exception.FastCrudException;\n" +
+            "import java.util.Arrays;\n" +
+            "import java.util.List;\n" +
+            "import javax.persistence.Entity;\n" +
+            "import org.springframework.util.ClassUtils;\n" +
+            "\n" +
+            "public class TargetEntity {\n" +
+            "\n" +
+            "    private final static String POSTFIX_REPOSITORY_BEAN_NAME = \"Repository\";\n" +
+            "\n" +
+            "    private final Class<?> type;\n" +
+            "    private final String rootPath;\n" +
+            "    private final String repositoryBeanName;\n" +
+            "\n" +
+            "    public TargetEntity(Object targetObj) {\n" +
+            "        if (!targetObj.getClass().isAnnotationPresent(Entity.class)) {\n" +
+            "            throw new FastCrudException(\"CRUD annotation must be with @Entity annotation\");\n" +
+            "        }\n" +
+            "        this.type = targetObj.getClass();\n" +
+            "\n" +
+            "        final String classShortName = ClassUtils.getShortNameAsProperty(type);\n" +
+            "        this.rootPath = rootPath(classShortName);\n" +
+            "        this.repositoryBeanName = repositoryBeanName(classShortName);\n" +
+            "    }\n" +
+            "\n" +
+            "    private String rootPath(String classShortName) {\n" +
+            "        final String userDefinedRootPath = crud().rootPath();\n" +
+            "        return userDefinedRootPath.isEmpty() ? classShortName : userDefinedRootPath;\n" +
+            "    }\n" +
+            "\n" +
+            "    private String repositoryBeanName(String classShortName) {\n" +
+            "        final String defaultRepositoryBeanName = classShortName + POSTFIX_REPOSITORY_BEAN_NAME;\n" +
+            "        final String userDefinedRepositoryBeanName = crud().repositoryBean();\n" +
+            "        return userDefinedRepositoryBeanName.isEmpty() ? defaultRepositoryBeanName : userDefinedRepositoryBeanName;\n" +
+            "    }\n" +
+            "\n" +
+            "    public List<CrudType> excludedTypes() {\n" +
+            "        return Arrays.asList(crud().excludeType());\n" +
+            "    }\n" +
+            "\n" +
+            "    public String rootPath() {\n" +
+            "        return rootPath;\n" +
+            "    }\n" +
+            "\n" +
+            "    public String repositoryBeanName() {\n" +
+            "        return repositoryBeanName;\n" +
+            "    }\n" +
+            "\n" +
+            "    private CRUD crud() {\n" +
+            "        return type.getAnnotation(CRUD.class);\n" +
+            "    }\n" +
+            "\n" +
+            "    public Class<?> type() {\n" +
+            "        return type;\n" +
+            "    }\n" +
+            "}";
 
     @Autowired
     private CodeService codeService;
 
     @PostConstruct
-    public void test() {
-        codeService.create(Language.JAVA, "com.ecsimsw.springelk.domain", 10, className, content);
+    public void setUp() {
+        final CodeFile codeFile = new CodeFile(className, star, path, Language.JAVA, content);
+        codeService.create(codeFile);
     }
 }

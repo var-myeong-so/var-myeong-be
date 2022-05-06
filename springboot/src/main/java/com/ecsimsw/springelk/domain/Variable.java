@@ -7,8 +7,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Objects;
 
-@Document(indexName = "variable_name")
-public class VariableName {
+@Document(indexName = "variable")
+public class Variable {
 
     @Id
     private String id;
@@ -25,7 +25,7 @@ public class VariableName {
     @Field(type = FieldType.Keyword)
     private String name;
 
-    public VariableName(String codeId, Language language, Integer star, String name) {
+    public Variable(String codeId, Language language, Integer star, String name) {
         if(Objects.isNull(codeId)) {
             throw new IllegalArgumentException("code id can't be null");
         }
@@ -53,25 +53,5 @@ public class VariableName {
 
     public String getName() {
         return name;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setCodeId(String codeId) {
-        this.codeId = codeId;
-    }
-
-    public void setLanguage(Language language) {
-        this.language = language;
-    }
-
-    public void setStar(Integer star) {
-        this.star = star;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

@@ -5,10 +5,12 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Document(indexName = "code")
 public class Code {
@@ -42,55 +44,41 @@ public class Code {
         this.content = content;
     }
 
-    public List<VariableName> variableNames() {
-        final List<VariableName> variableNames = new ArrayList<>();
+    public List<Variable> variableNames() {
+        final Set<String> variableNames = new HashSet<>();
         final Pattern variablePattern = language.variablePattern();
         for (String line : content.split("\n")) {
             final Matcher matcher = variablePattern.matcher(line);
             if (matcher.find()) {
-                variableNames.add(new VariableName(id, language, star, matcher.group()));
+                variableNames.add(matcher.group());
             }
         }
-        return variableNames;
+        return variableNames.stream()
+                .map(name -> new Variable(id, language, star, name))
+                .collect(Collectors.toList());
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public Language getLanguage() {
         return language;
-    }
-
-    public void setLanguage(Language language) {
-        this.language = language;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getClassName() {
         return className;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public Integer getStar() {
+        return star;
     }
 
     public String getContent() {
         return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 }

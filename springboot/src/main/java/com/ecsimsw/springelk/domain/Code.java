@@ -58,27 +58,27 @@ public class Code {
                 .collect(Collectors.toList());
     }
 
-    public String getId() {
+    public String id() {
         return id;
     }
 
-    public Language getLanguage() {
+    public Language language() {
         return language;
     }
 
-    public String getPath() {
+    public String path() {
         return path;
     }
 
-    public String getClassName() {
+    public String className() {
         return className;
     }
 
-    public Integer getStar() {
+    public Integer star() {
         return star;
     }
 
-    public String getContent() {
+    public String content() {
         return content;
     }
 }

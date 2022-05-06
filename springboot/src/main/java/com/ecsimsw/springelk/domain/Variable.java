@@ -35,23 +35,23 @@ public class Variable {
         this.name = name;
     }
 
-    public String getId() {
+    public String id() {
         return id;
     }
 
-    public String getCodeId() {
+    public String codeId() {
         return codeId;
     }
 
-    public Language getLanguage() {
+    public Language language() {
         return language;
     }
 
-    public Integer getStar() {
+    public Integer star() {
         return star;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 }

@@ -1,6 +1,6 @@
 package com.ecsimsw.springelk;
 
-import com.ecsimsw.springelk.application.CodeService;
+import com.ecsimsw.springelk.application.AdminService;
 import com.ecsimsw.springelk.domain.Language;
 import com.ecsimsw.springelk.dto.CodeFile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,11 +85,11 @@ class TestDummy {
             "}";
 
     @Autowired
-    private CodeService codeService;
+    private AdminService adminService;
 
     @PostConstruct
     public void setUp() {
         final CodeFile codeFile = new CodeFile(className, star, path, Language.JAVA, content);
-        codeService.create(codeFile);
+        adminService.storeCode(codeFile);
     }
 }

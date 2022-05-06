@@ -10,12 +10,9 @@ import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RegexTest {
+public class VariableNameRegexTest {
 
-    public final String regex = "(?<=int |float |String |double )([a-zA-Z_]\\w*)(?=,|;|\\s)|([a-zA-Z_]\\w*)(?=,|;|\\s*=)";
-
-    public final String r1= "(?<=int |float |String |double )([a-zA-Z_]\\w*)(?=,|;|\\s)|([a-zA-Z_]\\w*)(?=,|;|\\s*=)";
-    public final String r2 = "[A-Z][a-zA-Z0-9_]*";
+    public final String regex = "(?<=([a-zA-Z0-9_][\\s]))([a-zA-Z0-9_]*)(?=(\\s=))";
 
     @DisplayName("대문자 시작, 영어 + 숫자 + _을 포함하는 단어 확인")
     @Test
@@ -36,15 +33,6 @@ public class RegexTest {
         assertThat(matcher.group()).isEqualTo(varName);
     }
 
-    @DisplayName("어떤 단어 뒤가 ';' 또는 '=' 또는 ' =' 인지 확인")
-    @Test
-    public void nextWord() {
-        final String varName = "Heee324_";
-        final Matcher matcher = Pattern.compile(".+(=?[;|\\$=])").matcher("Heee324_=");
-        assertThat(matcher.find()).isTrue();
-        assertThat(matcher.group()).isEqualTo(varName);
-    }
-
     @DisplayName("변수명을 검색할 수 있는 정규식을 작성한다.")
     @ValueSource(strings = {
             "int h1 = 100;",
@@ -58,7 +46,7 @@ public class RegexTest {
     @ParameterizedTest
     public void regexTest(String code) {
         final String varName = "h1";
-        final Matcher matcher = Pattern.compile(r2).matcher(code);
+        final Matcher matcher = Pattern.compile(regex).matcher(code);
         assertThat(matcher.find()).isTrue();
         assertThat(matcher.group()).isEqualTo(varName);
     }
@@ -72,7 +60,7 @@ public class RegexTest {
     })
     @ParameterizedTest
     public void regexTest_nonExistence(String code) {
-        final Matcher matcher = Pattern.compile(r2).matcher(code);
+        final Matcher matcher = Pattern.compile(regex).matcher(code);
         assertThat(matcher.find()).isFalse();
     }
 }

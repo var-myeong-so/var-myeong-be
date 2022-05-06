@@ -5,6 +5,11 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Document(indexName = "code")
 public class Code {
 
@@ -17,8 +22,8 @@ public class Code {
     @Field(type = FieldType.Keyword)
     private String path;
 
-	@Field(type = FieldType.Integer)
-	private Integer star;
+    @Field(type = FieldType.Integer)
+    private Integer star;
 
     @Field(type = FieldType.Keyword)
     private String className;
@@ -35,6 +40,18 @@ public class Code {
         this.star = star;
         this.className = className;
         this.content = content;
+    }
+
+    public List<VariableName> variableNames() {
+        final List<VariableName> variableNames = new ArrayList<>();
+        final Pattern variablePattern = language.variablePattern();
+        for (String line : content.split("\n")) {
+            final Matcher matcher = variablePattern.matcher(line);
+            if (matcher.find()) {
+                variableNames.add(new VariableName(id, language, star, matcher.group()));
+            }
+        }
+        return variableNames;
     }
 
     public String getId() {
@@ -75,16 +92,5 @@ public class Code {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    @Override
-    public String toString() {
-        return "Code{\n" +
-                "id='" + id + "\n" +
-                ", language=" + language + "\n" +
-                ", path='" + path + "\n" +
-                ", className='" + className + "\n" +
-                ", content='" + content + "\n" +
-                "}\n";
     }
 }

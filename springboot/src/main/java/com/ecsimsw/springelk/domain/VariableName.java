@@ -5,6 +5,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.Objects;
+
 @Document(indexName = "variable_name")
 public class VariableName {
 
@@ -24,6 +26,9 @@ public class VariableName {
     private String name;
 
     public VariableName(String codeId, Language language, Integer star, String name) {
+        if(Objects.isNull(codeId)) {
+            throw new IllegalArgumentException("code id can't be null");
+        }
         this.codeId = codeId;
         this.language = language;
         this.star = star;

@@ -17,7 +17,6 @@ public class CodeController {
 		this.codeService = codeService;
 	}
 
-	// ex, localhost:8080/content?regex=String
 	@GetMapping("/content")
 	public List<Code> findAllByContent(@RequestParam String regex) {
 		return codeService.findAllByContentRegex(regex);

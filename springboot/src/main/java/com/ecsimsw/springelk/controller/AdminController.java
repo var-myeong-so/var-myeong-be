@@ -2,8 +2,6 @@ package com.ecsimsw.springelk.controller;
 
 import com.ecsimsw.springelk.application.AdminService;
 import com.ecsimsw.springelk.application.CodeCrawler;
-import com.ecsimsw.springelk.domain.Code;
-import com.ecsimsw.springelk.domain.Variable;
 import com.ecsimsw.springelk.dto.CodeFile;
 import com.ecsimsw.springelk.dto.CodeResponse;
 import com.ecsimsw.springelk.dto.VariableResponse;

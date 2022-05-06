@@ -26,7 +26,7 @@ public class Variable {
     private String name;
 
     public Variable(String codeId, Language language, Integer star, String name) {
-        if(Objects.isNull(codeId)) {
+        if (Objects.isNull(codeId)) {
             throw new IllegalArgumentException("code id can't be null");
         }
         this.codeId = codeId;

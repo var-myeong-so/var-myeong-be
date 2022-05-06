@@ -4,15 +4,15 @@ import java.util.regex.Pattern;
 
 public enum Language {
 
-	JAVA(Pattern.compile("(?<=([a-zA-Z0-9_][\\s]))([a-zA-Z0-9_]*)(?=(\\s=))"));
+    JAVA(Pattern.compile("(?<=([a-zA-Z0-9_][\\s]))([a-zA-Z0-9_]*)(?=(\\s=))"));
 
-	private final Pattern variablePattern;
+    private final Pattern variablePattern;
 
-	Language(Pattern variablePattern) {
-		this.variablePattern = variablePattern;
-	}
+    Language(Pattern variablePattern) {
+        this.variablePattern = variablePattern;
+    }
 
-	public Pattern variablePattern() {
-		return variablePattern;
-	}
+    public Pattern variablePattern() {
+        return variablePattern;
+    }
 }

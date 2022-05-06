@@ -42,6 +42,6 @@ class TestDummy {
 
     @PostConstruct
     public void test() {
-        codeService.create(Language.JAVA, "com.ecsimsw.springelk.domain", className, content);
+        codeService.create(Language.JAVA, "com.ecsimsw.springelk.domain", 10, className, content);
     }
 }

@@ -29,9 +29,10 @@ public class Code {
     public Code() {
     }
 
-    public Code(Language language, String path, String className, String content) {
+    public Code(Language language, String path, Integer star, String className, String content) {
         this.language = language;
         this.path = path;
+        this.star = star;
         this.className = className;
         this.content = content;
     }

@@ -5,8 +5,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "variable")
-public class Variable {
+@Document(indexName = "class_name")
+public class ClassName {
 
     @Id
     private String id;
@@ -23,7 +23,7 @@ public class Variable {
     @Field(type = FieldType.Keyword)
     private String name;
 
-    public Variable(String codeId, Language language, Integer star, String name) {
+    public ClassName(String codeId, Language language, Integer star, String name) {
         this.codeId = codeId;
         this.language = language;
         this.star = star;

@@ -19,8 +19,8 @@ public class CodeService {
 	}
 
 	@Transactional
-	public Code create(Language language, String path, String className, String content) {
-		final Code code = new Code(language, path, className, content);
+	public Code create(Language language, String path, Integer star, String className, String content) {
+		final Code code = new Code(language, path, star, className, content);
 		return codeRepository.save(code);
 	}
 

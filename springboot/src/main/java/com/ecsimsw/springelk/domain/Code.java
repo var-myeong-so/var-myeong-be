@@ -2,79 +2,88 @@ package com.ecsimsw.springelk.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 @Document(indexName = "code")
 public class Code {
 
-	@Id
-	private String id;
+    @Id
+    private String id;
 
-	private Language language;
+    @Field(type = FieldType.Keyword)
+    private Language language;
 
-	private String path;
+    @Field(type = FieldType.Keyword)
+    private String path;
 
-	private String className;
+	@Field(type = FieldType.Integer)
+	private Integer star;
 
-	private String content;
+    @Field(type = FieldType.Keyword)
+    private String className;
 
-	public Code() {
-	}
+    @Field(type = FieldType.Text)
+    private String content;
 
-	public Code(Language language, String path, String className, String content) {
-		this.language = language;
-		this.path = path;
-		this.className = className;
-		this.content = content;
-	}
+    public Code() {
+    }
 
-	public String getId() {
-		return id;
-	}
+    public Code(Language language, String path, String className, String content) {
+        this.language = language;
+        this.path = path;
+        this.className = className;
+        this.content = content;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public Language getLanguage() {
-		return language;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setLanguage(Language language) {
-		this.language = language;
-	}
+    public Language getLanguage() {
+        return language;
+    }
 
-	public String getPath() {
-		return path;
-	}
+    public void setLanguage(Language language) {
+        this.language = language;
+    }
 
-	public void setPath(String path) {
-		this.path = path;
-	}
+    public String getPath() {
+        return path;
+    }
 
-	public String getClassName() {
-		return className;
-	}
+    public void setPath(String path) {
+        this.path = path;
+    }
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    public String getClassName() {
+        return className;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	@Override
-	public String toString() {
-		return "Code{\n" +
-				"id='" + id + "\n" +
-				", language=" + language + "\n"+
-				", path='" + path + "\n" +
-				", className='" + className + "\n" +
-				", content='" + content + "\n" +
-				"}\n";
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "Code{\n" +
+                "id='" + id + "\n" +
+                ", language=" + language + "\n" +
+                ", path='" + path + "\n" +
+                ", className='" + className + "\n" +
+                ", content='" + content + "\n" +
+                "}\n";
+    }
 }

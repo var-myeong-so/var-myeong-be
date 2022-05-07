@@ -35,19 +35,19 @@ public class AdminController {
     }
 
     @DeleteMapping("/admin/code/{id}")
-    public ResponseEntity<Void> deleteCode(@PathVariable String id) {
+    public ResponseEntity<Void> deleteById(@PathVariable String id) {
         adminService.deleteCodeById(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin/variable/{id}")
-    public ResponseEntity<Void> deleteVariable(@PathVariable String id) {
+    public ResponseEntity<Void> deleteByVariableId(@PathVariable String id) {
         adminService.deleteVariableById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/admin/variable")
-    public ResponseEntity<Void> deleteVariableByName(String name) {
+    @DeleteMapping("/admin/variable/{name}")
+    public ResponseEntity<Void> deleteByVariable(@PathVariable String name) {
         adminService.deleteVariableByName(name);
         return ResponseEntity.noContent().build();
     }

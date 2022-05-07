@@ -2,6 +2,7 @@ package com.ecsimsw.springelk;
 
 import com.ecsimsw.springelk.application.AdminService;
 import com.ecsimsw.springelk.domain.Language;
+import com.ecsimsw.springelk.domain.VariablePattern;
 import com.ecsimsw.springelk.dto.CodeFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

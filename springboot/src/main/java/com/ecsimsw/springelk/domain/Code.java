@@ -1,15 +1,16 @@
 package com.ecsimsw.springelk.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Document(indexName = "code")
@@ -33,6 +34,9 @@ public class Code {
     @Field(type = FieldType.Text)
     private String content;
 
+    @Transient
+    private VariablePattern variablePattern;
+
     public Code() {
     }
 
@@ -42,12 +46,12 @@ public class Code {
         this.star = star;
         this.className = className;
         this.content = content;
+        this.variablePattern = VariablePattern.of(language);
     }
 
     public List<Variable> variableNames() {
         final Set<String> variableNames = new HashSet<>();
-        final Pattern variablePattern = language.variablePattern();
-        for (String line : content.split("\n")) {
+        for (String line : contentLines()) {
             final Matcher matcher = variablePattern.matcher(line);
             if (matcher.find()) {
                 variableNames.add(matcher.group());
@@ -56,6 +60,33 @@ public class Code {
         return variableNames.stream()
                 .map(name -> new Variable(id, language, star, name))
                 .collect(Collectors.toList());
+    }
+
+    public Integer firstPositionOf(Variable variable) {
+        final List<String> lines = contentLines();
+        for(int index = 0; index< lines.size(); index++) {
+            final String line = lines.get(index);
+            if (line.contains(variable.name()) && variablePattern.matches(line)) {
+                return index;
+            }
+        }
+        throw new IllegalArgumentException("Unmatched variable");
+    }
+
+    public List<Integer> positionsOf(Variable variable) {
+        final List<String> lines = contentLines();
+        final List<Integer> indexes = new ArrayList<>();
+        for(int index = 0; index< lines.size(); index++) {
+            final String line = lines.get(index);
+            if (line.contains(variable.name()) && variablePattern.matches(line)) {
+                indexes.add(index);
+            }
+        }
+        return indexes;
+    }
+
+    public List<String> contentLines() {
+        return List.of(content.split("\n"));
     }
 
     public String id() {

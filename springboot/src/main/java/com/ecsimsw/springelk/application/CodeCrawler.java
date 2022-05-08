@@ -1,6 +1,7 @@
 package com.ecsimsw.springelk.application;
 
 import com.ecsimsw.springelk.dto.CodeFile;
+import com.ecsimsw.springelk.util.CommandFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -17,7 +18,6 @@ public class CodeCrawler {
 	private static final String CLONE_PATH = "springboot/src/main/resources/githubcodes";
 	private static final String JAVA_EXTENSION = "java";
 	private static final String NEW_LINE = "\n";
-	private static Integer DIRECTORY_NUMBER = 0;
 	private final List<File> javaFiles = new ArrayList<>();
 
 	public List<CodeFile> execute(String url) throws IOException, InterruptedException {
@@ -27,15 +27,10 @@ public class CodeCrawler {
 	}
 
 	private void saveCodes(String url) throws IOException, InterruptedException {
-		String command = makeCommandGitClone(url);
+		String command = CommandFactory.makeCommandGitClone(url);
 		Process process = Runtime.getRuntime().exec(command);
 		process.waitFor();
-		System.out.println("exit: " + process.exitValue());
 		process.destroy();
-	}
-
-	private String makeCommandGitClone(String url) {
-		return "git clone " + url + " " + CLONE_PATH + "/" + DIRECTORY_NUMBER++;
 	}
 
 	private List<File> findJavaFiles(String path) {

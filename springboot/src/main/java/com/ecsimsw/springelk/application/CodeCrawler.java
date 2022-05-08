@@ -1,6 +1,7 @@
 package com.ecsimsw.springelk.application;
 
 import com.ecsimsw.springelk.dto.CodeFile;
+import com.ecsimsw.springelk.util.CodeFileFactory;
 import com.ecsimsw.springelk.util.CommandFactory;
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,8 +23,7 @@ public class CodeCrawler {
 
 	public List<CodeFile> execute(String url) throws IOException, InterruptedException {
 		saveCodes(url);
-		readCode();
-		return null;
+        return readCodes(url);
 	}
 
 	private void saveCodes(String url) throws IOException, InterruptedException {
@@ -46,14 +46,14 @@ public class CodeCrawler {
 		return javaFiles;
 	}
 
-	private List<String> readCode() throws IOException {
+	private List<CodeFile> readCodes(String url) throws IOException {
 		List<File> javaFiles = findJavaFiles(CLONE_PATH);
-		List<String> codes = new ArrayList<>();
+		List<CodeFile> codes = new ArrayList<>();
 		for (File javaFile : javaFiles) {
 			FileReader fileReader = new FileReader(javaFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			String codeFile = getFileContents(bufferedReader);
-			codes.add(codeFile);
+            CodeFile codeFile = CodeFileFactory.makeCodeFile(getFileContents(bufferedReader), url);
+            codes.add(codeFile);
 		}
 		return codes;
 	}

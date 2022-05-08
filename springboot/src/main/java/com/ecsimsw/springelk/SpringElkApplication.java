@@ -2,7 +2,6 @@ package com.ecsimsw.springelk;
 
 import com.ecsimsw.springelk.application.AdminService;
 import com.ecsimsw.springelk.domain.Language;
-import com.ecsimsw.springelk.domain.VariablePattern;
 import com.ecsimsw.springelk.dto.CodeFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +23,9 @@ public class SpringElkApplication {
 @Component
 class TestDummy {
     private static final String path = "https://github.com/ecsimsw/fast-crud/blob/develop/src/main/java/com/ecsimsw/fastcrud/TargetEntity.java";
+    private static final String userName = "ecsimsw";
+    private static final String projectName = "fast-crud";
+    private static final String packageName = "fastcrud";
     private static final String className = "TargetEntity";
     private static final int star = 10;
     private static final String content = "package com.ecsimsw.fastcrud;\n" +
@@ -92,7 +94,7 @@ class TestDummy {
 
     @PostConstruct
     public void setUp() {
-        final CodeFile codeFile = new CodeFile(className, star, path, Language.JAVA, content);
+        final CodeFile codeFile = new CodeFile(className, userName, projectName, packageName, star, path, Language.JAVA, content);
         adminService.storeCode(codeFile);
     }
 }

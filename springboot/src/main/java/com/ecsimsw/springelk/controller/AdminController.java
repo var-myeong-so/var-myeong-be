@@ -5,6 +5,7 @@ import com.ecsimsw.springelk.application.CodeCrawler;
 import com.ecsimsw.springelk.dto.CodeFile;
 import com.ecsimsw.springelk.dto.CodeResponse;
 import com.ecsimsw.springelk.dto.VariableResponse;
+import java.io.IOException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class AdminController {
     }
 
     @PutMapping("/admin/code")
-    public ResponseEntity<List<CodeResponse>> saveProject(String url) {
+    public ResponseEntity<List<CodeResponse>> saveProject(String url) throws IOException, InterruptedException {
         final List<CodeFile> codeFiles = codeCrawler.execute(url);
         return ResponseEntity.ok(adminService.storeCode(codeFiles));
     }

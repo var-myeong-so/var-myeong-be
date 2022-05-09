@@ -1,8 +1,6 @@
 package com.ecsimsw.springelk.application;
 
 import com.ecsimsw.springelk.dto.CodeFile;
-import com.ecsimsw.springelk.util.CodeFileFactory;
-import com.ecsimsw.springelk.util.CommandFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -19,18 +17,23 @@ public class CodeCrawler {
 	private static final String CLONE_PATH = "springboot/src/main/resources/githubcodes";
 	private static final String JAVA_EXTENSION = "java";
 	private static final String NEW_LINE = "\n";
+	private static int DIRECTORY_NUMBER = 0;
 	private final List<File> javaFiles = new ArrayList<>();
 
 	public List<CodeFile> execute(String url) throws IOException, InterruptedException {
 		saveCodes(url);
-        return readCodes(url);
+		return readCodes(url);
 	}
 
 	private void saveCodes(String url) throws IOException, InterruptedException {
-		String command = CommandFactory.makeCommandGitClone(url);
+		String command = makeCommandGitClone(url);
 		Process process = Runtime.getRuntime().exec(command);
 		process.waitFor();
 		process.destroy();
+	}
+
+	private String makeCommandGitClone(String url) {
+		return "git clone " + url + " " + CLONE_PATH + "/" + DIRECTORY_NUMBER++;
 	}
 
 	private List<File> findJavaFiles(String path) {
@@ -52,8 +55,8 @@ public class CodeCrawler {
 		for (File javaFile : javaFiles) {
 			FileReader fileReader = new FileReader(javaFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-            CodeFile codeFile = CodeFileFactory.makeCodeFile(getFileContents(bufferedReader), url);
-            codes.add(codeFile);
+			CodeFile codeFile = CodeFile.of(getFileContents(bufferedReader), url);
+			codes.add(codeFile);
 		}
 		return codes;
 	}

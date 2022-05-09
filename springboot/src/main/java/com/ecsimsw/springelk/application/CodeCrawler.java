@@ -32,10 +32,6 @@ public class CodeCrawler {
 		process.destroy();
 	}
 
-	private String makeCommandGitClone(String url) {
-		return "git clone " + url + " " + CLONE_PATH + "/" + DIRECTORY_NUMBER++;
-	}
-
 	private List<File> findJavaFiles(String path) {
 		final File directory = new File(path);
 		List<File> files = List.of(Objects.requireNonNull(directory.listFiles()));
@@ -55,7 +51,8 @@ public class CodeCrawler {
 		for (File javaFile : javaFiles) {
 			FileReader fileReader = new FileReader(javaFile);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			CodeFile codeFile = CodeFile.of(getFileContents(bufferedReader), url);
+			CodeFile codeFile = CodeFile.of(getFileContents(bufferedReader), url,
+				javaFile.getName());
 			codes.add(codeFile);
 		}
 		return codes;
@@ -71,5 +68,9 @@ public class CodeCrawler {
 			fileContents.append(line).append(NEW_LINE);
 		}
 		return fileContents.toString();
+	}
+
+	private String makeCommandGitClone(String url) {
+		return "git clone " + url + " " + CLONE_PATH + "/" + DIRECTORY_NUMBER++;
 	}
 }

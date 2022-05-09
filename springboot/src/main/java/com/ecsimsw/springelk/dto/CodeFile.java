@@ -35,12 +35,12 @@ public class CodeFile {
 		this.content = content;
 	}
 
-	public static CodeFile of(String fileContents, String url) throws IOException {
+	public static CodeFile of(String fileContents, String url, String fileName) throws IOException {
 		List<String> urlSplit = List.of(url.split("/"));
 		String userName = urlSplit.get(3);
 		String projectName = List.of(urlSplit.get(4).split("\\.")).get(0);
 		return new CodeFile(
-			calculateClassName(fileContents),
+			calculateClassName(fileName),
 			userName,
 			projectName,
 			calculatePackageName(fileContents),
@@ -102,7 +102,8 @@ public class CodeFile {
 
 	private static String calculateClassName(String fileName) {
 		// TODO::regex로 수정이 필요하다.
-		return "className";
+		List<String> splitByDot = List.of(fileName.split("\\."));
+		return splitByDot.get(0);
 	}
 
 	public Code asCode() {

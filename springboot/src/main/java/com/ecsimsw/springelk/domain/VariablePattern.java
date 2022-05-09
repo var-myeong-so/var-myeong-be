@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public enum VariablePattern {
 
-    JAVA(Language.JAVA, Pattern.compile("(?<=([a-zA-Z0-9_>][\\s]))([a-zA-Z0-9_]*)(?=(\\s=))|(?<!return\\s)(?<!=\\s)(?<=\\s)([a-zA-Z0-9_]*)(?=(;))"));
+    JAVA(Language.JAVA, Pattern.compile("(?<=([a-zA-Z0-9_>\\]][\\s]))([a-zA-Z0-9_]*)(?=(\\s=))|(?<!return\\s)(?<!=\\s)(?<=[a-zA-Z0-9_>\\]]\\s)([a-zA-Z0-9_]*)(?=(;))|(?<=\\()([a-zA-Z0-9_]*)(?=(\\sinstanceof))|(?<=[a-zA-Z0-9_>\\]][\\s])([a-zA-Z0-9_]*)(?=(\\s:))"));
 
     private final Language language;
     private final Pattern pattern;

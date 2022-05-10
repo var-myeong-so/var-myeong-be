@@ -113,13 +113,13 @@ public class Code {
         return content;
     }
 
-    public int classIndex() {
+    public Integer classIndex() {
         List<String> lines = contentLines();
         for (String line : lines) {
             if (ClassPattern.JAVA.matches(line)) {
                 return lines.indexOf(line);
             }
         }
-        return 0;
+        throw new IllegalArgumentException("Unmatched class");
     }
 }

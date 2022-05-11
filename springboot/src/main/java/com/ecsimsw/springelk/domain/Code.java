@@ -35,7 +35,7 @@ public class Code {
     private String content;
 
     @Transient
-    private VariablePattern variablePattern;
+    private VariablePattern variablePattern = VariablePattern.JAVA;
 
     public Code() {
     }
@@ -111,5 +111,15 @@ public class Code {
 
     public String content() {
         return content;
+    }
+
+    public Integer classIndex() {
+        List<String> lines = contentLines();
+        for (String line : lines) {
+            if (ClassPattern.JAVA.matches(line)) {
+                return lines.indexOf(line);
+            }
+        }
+        throw new IllegalArgumentException("Unmatched class");
     }
 }

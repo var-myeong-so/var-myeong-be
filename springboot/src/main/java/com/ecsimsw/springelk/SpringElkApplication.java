@@ -92,44 +92,9 @@ class TestDummy {
     @Autowired
     private AdminService adminService;
 
+    @PostConstruct
     public void setUp() {
-        CodeFile codeFile = new CodeFile(className, userName, projectName, packageName, 1, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 2, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 3, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 4, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 5, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 6, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 7, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 8, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 9, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 10, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 11, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 12, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-
-        codeFile = new CodeFile(className, userName, projectName, packageName, 13, path, Language.JAVA, content);
+        final CodeFile codeFile = new CodeFile(className, userName, projectName, packageName, star, path, Language.JAVA, content);
         adminService.storeCode(codeFile);
     }
 }

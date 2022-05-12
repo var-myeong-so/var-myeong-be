@@ -23,6 +23,12 @@ public class SearchService {
 		this.variableRepository = variableRepository;
 	}
 
+	public List<SearchResponse> findCodeByWord(String name, Pageable pageable) {
+		return codeRepository.findAllByContentContaining(name, pageable).stream()
+			.map(code -> SearchResponse.parsingWithNLines(code, code.firstPositionOf(name), 3))
+			.collect(Collectors.toList());
+	}
+
 	public List<SearchResponse> findCodeByClassName(String className, Pageable pageable) {
 		return codeRepository.findAllByClassName(className, pageable).stream()
 			.map(code -> SearchResponse.parsingWithNLines(code, code.classIndex(), 3))

@@ -4,6 +4,8 @@ import com.ecsimsw.springelk.application.SearchService;
 import com.ecsimsw.springelk.dto.SearchResponse;
 import com.ecsimsw.springelk.utils.LimitedSizePagination;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,14 +23,29 @@ public class SearchController {
     }
 
     @LimitedSizePagination(maxSize = 20)
+    @GetMapping("/code/{name}")
+    public ResponseEntity<List<SearchResponse>> searchByWord(
+            @PathVariable String name,
+            @PageableDefault(sort = "star", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(searchService.findCodeByWord(name, pageable));
+    }
+
+    @LimitedSizePagination(maxSize = 20)
     @GetMapping("/code/class/{name}")
-    public ResponseEntity<List<SearchResponse>> searchByClass(@PathVariable String name, Pageable pageable) {
+    public ResponseEntity<List<SearchResponse>> searchByClass(
+            @PathVariable String name,
+            @PageableDefault(sort = "star", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         return ResponseEntity.ok(searchService.findCodeByClassName(name, pageable));
     }
 
     @LimitedSizePagination(maxSize = 20)
     @GetMapping("/code/variable/{name}")
-    public ResponseEntity<List<SearchResponse>> searchByVariable(@PathVariable String name, Pageable pageable) {
+    public ResponseEntity<List<SearchResponse>> searchByVariable(
+            @PathVariable String name,
+            @PageableDefault(sort = "star", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         return ResponseEntity.ok(searchService.findCodeByVariableName(name, pageable));
     }
 

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface CodeRepository extends ElasticsearchRepository<Code, String> {
 
+    List<Code> findAllByContentContaining(String word, Pageable pageable);
+
     List<Code> findAllByClassName(String className, Pageable pageable);
 
     Integer countByClassName(String className);

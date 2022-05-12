@@ -6,7 +6,6 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,9 +33,6 @@ public class Code {
     @Field(type = FieldType.Text)
     private String content;
 
-    @Transient
-    private VariablePattern variablePattern = VariablePattern.JAVA;
-
     public Code() {
     }
 
@@ -46,13 +42,12 @@ public class Code {
         this.star = star;
         this.className = className;
         this.content = content;
-        this.variablePattern = VariablePattern.of(language);
     }
 
     public List<Variable> variableNames() {
         final Set<String> variableNames = new HashSet<>();
         for (String line : contentLines()) {
-            final Matcher matcher = variablePattern.matcher(line);
+            final Matcher matcher = variablePattern().matcher(line);
             if (matcher.find()) {
                 variableNames.add(matcher.group());
             }
@@ -64,9 +59,9 @@ public class Code {
 
     public Integer firstPositionOf(Variable variable) {
         final List<String> lines = contentLines();
-        for(int index = 0; index< lines.size(); index++) {
+        for (int index = 0; index < lines.size(); index++) {
             final String line = lines.get(index);
-            if (line.contains(variable.name()) && variablePattern.matches(line)) {
+            if (line.contains(variable.name()) && variablePattern().matches(line)) {
                 return index;
             }
         }
@@ -75,7 +70,7 @@ public class Code {
 
     public Integer firstPositionOf(String name) {
         final List<String> lines = contentLines();
-        for(int index = 0; index< lines.size(); index++) {
+        for (int index = 0; index < lines.size(); index++) {
             final String line = lines.get(index);
             if (line.contains(name)) {
                 return index;
@@ -110,6 +105,11 @@ public class Code {
 
     public String content() {
         return content;
+    }
+
+    @Transient
+    public VariablePattern variablePattern() {
+        return VariablePattern.of(this.language);
     }
 
     public Integer classIndex() {

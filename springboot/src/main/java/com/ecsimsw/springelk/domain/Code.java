@@ -73,16 +73,15 @@ public class Code {
         throw new IllegalArgumentException("Unmatched variable");
     }
 
-    public List<Integer> positionsOf(Variable variable) {
+    public Integer firstPositionOf(String name) {
         final List<String> lines = contentLines();
-        final List<Integer> indexes = new ArrayList<>();
         for(int index = 0; index< lines.size(); index++) {
             final String line = lines.get(index);
-            if (line.contains(variable.name()) && variablePattern.matches(line)) {
-                indexes.add(index);
+            if (line.contains(name)) {
+                return index;
             }
         }
-        return indexes;
+        throw new IllegalArgumentException("Unmatched variable");
     }
 
     public List<String> contentLines() {

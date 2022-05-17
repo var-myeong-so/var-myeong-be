@@ -48,10 +48,10 @@ public class CodeCrawler {
 		final List<File> javaFiles = findJavaFiles(CLONE_PATH);
 		final List<CodeFile> codes = new ArrayList<>();
 		for (File javaFile : javaFiles) {
-			final FileReader fileReader = new FileReader(javaFile);
-			final BufferedReader bufferedReader = new BufferedReader(fileReader);
+			final BufferedReader bufferedReader = new BufferedReader(new FileReader(javaFile));
 			final CodeFile codeFile = CodeFile.of(getFileContents(bufferedReader), url, javaFile.getName());
 			codes.add(codeFile);
+			bufferedReader.close();
 		}
 		return codes;
 	}

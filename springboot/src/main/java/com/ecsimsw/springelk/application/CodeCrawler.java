@@ -17,7 +17,6 @@ public class CodeCrawler {
 	private static final String CLONE_PATH = "springboot/src/main/resources/githubcodes";
 	private static final String JAVA_EXTENSION = "java";
 	private static final String NEW_LINE = "\n";
-	private static int DIRECTORY_NUMBER = 0;
 	private final List<File> javaFiles = new ArrayList<>();
 
 	public List<CodeFile> execute(String url) throws IOException, InterruptedException {
@@ -26,15 +25,15 @@ public class CodeCrawler {
 	}
 
 	private void saveCodes(String url) throws IOException, InterruptedException {
-		String command = makeCommandGitClone(url);
-		Process process = Runtime.getRuntime().exec(command);
+		final String command = makeCommandGitClone(url);
+		final Process process = Runtime.getRuntime().exec(command);
 		process.waitFor();
 		process.destroy();
 	}
 
 	private List<File> findJavaFiles(String path) {
 		final File directory = new File(path);
-		List<File> files = List.of(Objects.requireNonNull(directory.listFiles()));
+		final List<File> files = List.of(Objects.requireNonNull(directory.listFiles()));
 		for (File file : files) {
 			if (file.isDirectory()) {
 				findJavaFiles(file.getPath());
@@ -46,14 +45,13 @@ public class CodeCrawler {
 	}
 
 	private List<CodeFile> readCodes(String url) throws IOException {
-		List<File> javaFiles = findJavaFiles(CLONE_PATH);
-		List<CodeFile> codes = new ArrayList<>();
+		final List<File> javaFiles = findJavaFiles(CLONE_PATH);
+		final List<CodeFile> codes = new ArrayList<>();
 		for (File javaFile : javaFiles) {
-			FileReader fileReader = new FileReader(javaFile);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			CodeFile codeFile = CodeFile.of(getFileContents(bufferedReader), url,
-				javaFile.getName());
+			final BufferedReader bufferedReader = new BufferedReader(new FileReader(javaFile));
+			final CodeFile codeFile = CodeFile.of(getFileContents(bufferedReader), url, javaFile.getName());
 			codes.add(codeFile);
+			bufferedReader.close();
 		}
 		return codes;
 	}
@@ -61,7 +59,7 @@ public class CodeCrawler {
 	private String getFileContents(BufferedReader bufferedReader) throws IOException {
 		final StringBuilder fileContents = new StringBuilder();
 		while (true) {
-			String line = bufferedReader.readLine();
+			final String line = bufferedReader.readLine();
 			if (line == null) {
 				break;
 			}
@@ -71,6 +69,13 @@ public class CodeCrawler {
 	}
 
 	private String makeCommandGitClone(String url) {
-		return "git clone " + url + " " + CLONE_PATH + "/" + DIRECTORY_NUMBER++;
+		return "git clone " + url + " " + CLONE_PATH + "/" + makeProjectName(url);
+	}
+
+	private String makeProjectName(String url) {
+		final List<String> splitUrl = List.of(url.split("/"));
+		final String projectNameWithExtension = splitUrl.get(splitUrl.size() - 1);
+		final List<String> splitProjectName = List.of(projectNameWithExtension.split("\\."));
+		return splitProjectName.get(0);
 	}
 }

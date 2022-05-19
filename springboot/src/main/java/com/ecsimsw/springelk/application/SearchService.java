@@ -50,4 +50,8 @@ public class SearchService {
 	public Integer countCodeByVariableName(String variableName) {
 		return variableRepository.countByName(variableName);
 	}
+
+	public Integer countCodeByWord(String word) {
+		return codeRepository.countAllByContentContaining(word);
+	}
 }

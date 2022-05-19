@@ -9,6 +9,8 @@ public interface CodeRepository extends ElasticsearchRepository<Code, String> {
 
     List<Code> findAllByContentContaining(String word, Pageable pageable);
 
+    Integer countAllByContentContaining(String word);
+
     List<Code> findAllByClassName(String className, Pageable pageable);
 
     Integer countByClassName(String className);

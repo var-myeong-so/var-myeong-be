@@ -31,6 +31,11 @@ public class SearchController {
         return ResponseEntity.ok(searchService.findCodeByWord(name, pageable));
     }
 
+    @GetMapping("/code/count/{name}")
+    public ResponseEntity<Integer> countByWord(@PathVariable String name) {
+        return ResponseEntity.ok(searchService.countCodeByWord(name));
+    }
+
     @LimitedSizePagination(maxSize = 20)
     @GetMapping("/code/class/{name}")
     public ResponseEntity<List<SearchResponse>> searchByClass(

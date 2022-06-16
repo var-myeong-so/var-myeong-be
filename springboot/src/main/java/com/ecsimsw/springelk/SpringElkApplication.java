@@ -92,9 +92,9 @@ class TestDummy {
     @Autowired
     private AdminService adminService;
 
-    @PostConstruct
-    public void setUp() {
-        final CodeFile codeFile = new CodeFile(className, userName, projectName, packageName, star, path, Language.JAVA, content);
-        adminService.storeCode(codeFile);
-    }
+//    @PostConstruct
+//    public void setUp() {
+//        final CodeFile codeFile = new CodeFile(className, userName, projectName, packageName, star, path, Language.JAVA, content);
+//        adminService.storeCode(codeFile);
+//    }
 }

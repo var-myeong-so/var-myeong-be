@@ -72,7 +72,7 @@ public class Code {
         final List<String> lines = contentLines();
         for (int index = 0; index < lines.size(); index++) {
             final String line = lines.get(index);
-            if (line.contains(name)) {
+            if (line.toLowerCase().contains(name.toLowerCase())) {
                 return index;
             }
         }

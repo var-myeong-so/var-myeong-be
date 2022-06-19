@@ -44,7 +44,7 @@ public class CodeFile {
 			userName,
 			projectName,
 			calculatePackageName(fileContents),
-			calculateStar(url),
+			10, //TODO:: star 개수 파싱하는 다른 방법 고민 후 적용한다.
 			calculatePath(url),
 			Language.JAVA,
 			fileContents);

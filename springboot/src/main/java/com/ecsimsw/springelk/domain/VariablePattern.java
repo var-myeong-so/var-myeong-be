@@ -30,4 +30,12 @@ public enum VariablePattern {
     public boolean matches(String input) {
         return pattern.matcher(input).find();
     }
+
+    public String getFirstMatched(String input) {
+        final Matcher matcher = pattern.matcher(input);
+        if(matcher.find()){
+            return matcher.group();
+        }
+        throw new IllegalArgumentException("Unmatched input");
+    }
 }

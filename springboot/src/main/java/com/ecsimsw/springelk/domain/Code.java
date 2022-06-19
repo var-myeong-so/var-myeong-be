@@ -15,110 +15,114 @@ import java.util.stream.Collectors;
 @Document(indexName = "code")
 public class Code {
 
-    @Id
-    private String id;
+	private static final VariablePattern JAVA_VARIABLE_PATTERN = VariablePattern.JAVA;
 
-    @Field(type = FieldType.Keyword)
-    private Language language;
+	@Id
+	private String id;
 
-    @Field(type = FieldType.Keyword)
-    private String path;
+	@Field(type = FieldType.Keyword)
+	private Language language;
 
-    @Field(type = FieldType.Integer)
-    private Integer star;
+	@Field(type = FieldType.Keyword)
+	private String path;
 
-    @Field(type = FieldType.Keyword)
-    private String className;
+	@Field(type = FieldType.Integer)
+	private Integer star;
 
-    @Field(type = FieldType.Text)
-    private String content;
+	@Field(type = FieldType.Keyword)
+	private String className;
 
-    public Code() {
-    }
+	@Field(type = FieldType.Text)
+	private String content;
 
-    public Code(Language language, String path, Integer star, String className, String content) {
-        this.language = language;
-        this.path = path;
-        this.star = star;
-        this.className = className;
-        this.content = content;
-    }
+	public Code() {
+	}
 
-    public List<Variable> variableNames() {
-        final Set<String> variableNames = new HashSet<>();
-        for (String line : contentLines()) {
-            final Matcher matcher = variablePattern().matcher(line);
-            if (matcher.find()) {
-                variableNames.add(matcher.group());
-            }
-        }
-        return variableNames.stream()
-                .map(name -> new Variable(id, language, star, name))
-                .collect(Collectors.toList());
-    }
+	public Code(Language language, String path, Integer star, String className, String content) {
+		this.language = language;
+		this.path = path;
+		this.star = star;
+		this.className = className;
+		this.content = content;
+	}
 
-    public Integer firstPositionOf(Variable variable) {
-        final List<String> lines = contentLines();
-        for (int index = 0; index < lines.size(); index++) {
-            final String line = lines.get(index);
-            if (line.contains(variable.name()) && variablePattern().matches(line)) {
-                return index;
-            }
-        }
-        throw new IllegalArgumentException("Unmatched variable");
-    }
+	public List<Variable> variableNames() {
+		final Set<String> variableNames = new HashSet<>();
+		for (String line : contentLines()) {
+			final Matcher matcher = variablePattern().matcher(line);
+			if (matcher.find()) {
+				variableNames.add(matcher.group());
+			}
+		}
+		return variableNames.stream()
+			.map(name -> new Variable(id, language, star, name))
+			.collect(Collectors.toList());
+	}
 
-    public Integer firstPositionOf(String name) {
-        final List<String> lines = contentLines();
-        for (int index = 0; index < lines.size(); index++) {
-            final String line = lines.get(index);
-            if (line.toLowerCase().contains(name.toLowerCase())) {
-                return index;
-            }
-        }
-        throw new IllegalArgumentException("Unmatched variable");
-    }
+	public Integer firstPositionOf(Variable variable) {
+		final List<String> lines = contentLines();
+		for (int index = 0; index < lines.size(); index++) {
+			final String line = lines.get(index);
+			if (line.contains(variable.name()) && JAVA_VARIABLE_PATTERN.matches(line)) {
+				if (JAVA_VARIABLE_PATTERN.getFirstMatched(line).equals(variable.name())) {
+					return index;
+				}
+			}
+		}
+		throw new IllegalArgumentException("Unmatched variable");
+	}
 
-    public List<String> contentLines() {
-        return List.of(content.split("\n"));
-    }
+	public Integer firstPositionOf(String name) {
+		final List<String> lines = contentLines();
+		for (int index = 0; index < lines.size(); index++) {
+			final String line = lines.get(index);
+			if (line.toLowerCase().contains(name.toLowerCase())) {
+				return index;
+			}
+		}
+		throw new IllegalArgumentException("Unmatched variable");
+	}
 
-    public String id() {
-        return id;
-    }
+	public List<String> contentLines() {
+		return List.of(content.split("\n"));
+	}
 
-    public Language language() {
-        return language;
-    }
+	public String id() {
+		return id;
+	}
 
-    public String path() {
-        return path;
-    }
+	public Language language() {
+		return language;
+	}
 
-    public String className() {
-        return className;
-    }
+	public String path() {
+		return path;
+	}
 
-    public Integer star() {
-        return star;
-    }
+	public String className() {
+		return className;
+	}
 
-    public String content() {
-        return content;
-    }
+	public Integer star() {
+		return star;
+	}
 
-    @Transient
-    public VariablePattern variablePattern() {
-        return VariablePattern.of(this.language);
-    }
+	public String content() {
+		return content;
+	}
 
-    public Integer classIndex() {
-        List<String> lines = contentLines();
-        for (String line : lines) {
-            if (ClassPattern.JAVA.matches(line)) {
-                return lines.indexOf(line);
-            }
-        }
-        throw new IllegalArgumentException("Unmatched class");
-    }
+	@Transient
+	public VariablePattern variablePattern() {
+		return VariablePattern.of(this.language);
+	}
+
+	public Integer classIndex() {
+		List<String> lines = contentLines();
+		for (String line : lines) {
+			if (ClassPattern.JAVA.matches(line)) {
+				return lines.indexOf(line);
+			}
+		}
+		throw new IllegalArgumentException("Unmatched class");
+	}
 }
